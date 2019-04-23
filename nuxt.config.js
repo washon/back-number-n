@@ -1,5 +1,6 @@
 import pkg from './package'
 
+require('dotenv').config()
 export default {
   mode: 'universal',
 
@@ -39,6 +40,7 @@ export default {
   ** Nuxt.js modules
   */
   modules: [
+    '@nuxtjs/dotenv',
     // Doc: https://axios.nuxtjs.org/usage
     '@nuxtjs/axios',
     // Doc: https://buefy.github.io/#/documentation
