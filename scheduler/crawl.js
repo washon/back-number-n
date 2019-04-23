@@ -18,9 +18,11 @@ async function main() {
   console.log('-----------------------------------------------')
   initAdmin(admin)
 
-  await UpdateDB.update(admin).catch((err) => {
-    console.log(err)
-  })
+  await UpdateDB.update(admin).catch((err) => { console.log(err) })
+
+  console.log('-----------------------------------------------')
+  console.log(`finish crawl : ${new Date()}`)
+  process.exit(0)
 }
 
 main()

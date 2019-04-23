@@ -20,12 +20,13 @@ const UpdateDB = {
     const channelId = UpdateDB.DEFAULT_CHANNEL_ID
     const ytPlaylists = await YouTubeAPI.getPlaylists(channelId)
 
+    const promises = []
     const MAX_COUNT = 1
     let count = 0
     for (const item of ytPlaylists.items) {
       if (count > MAX_COUNT) {
         console.log('Stopping update playlists, cause too many updatable playlist.')
-        return
+        return Promise.all(promises)
       }
 
       const hasPlaylist = (ownPlaylists || []).some(e => (e.playlistId === item.id))
@@ -44,9 +45,10 @@ const UpdateDB = {
           thumbnails: item.snippet.thumbnails
         })
 
-        UpdateDB.updatePlaylistItems(admin, item.id)
+        promises.push(UpdateDB.updatePlaylistItems(admin, item.id))
       }
     }
+    return Promise.all(promises)
   },
 
   updatePlaylistItems: async (admin, playlistId) => {
@@ -58,22 +60,31 @@ const UpdateDB = {
     const playlistItems = await YouTubeAPI.getPlaylistItems(playlistId).catch((err) => {
       console.log(err)
     })
+
+    const promises = []
     for (const [index, item] of playlistItems.items.entries()) {
       const videoId = item.contentDetails.videoId
 
-      const queryVideos = admin.database().ref('videos').child(videoId)
-      let videoInfo = await queryVideos.once('value')
-      if (videoInfo.val() === null) {
-        await UpdateDB.updateVideoInfo(admin, videoId)
-        videoInfo = await queryVideos.once('value')
-      }
+      promises.push(
+        (
+          async () => {
+            const queryVideos = admin.database().ref('videos').child(videoId)
+            let videoInfo = await queryVideos.once('value')
+            if (videoInfo.val() === null) {
+              await UpdateDB.updateVideoInfo(admin, videoId)
+              videoInfo = await queryVideos.once('value')
+            }
 
-      const tracksRef = admin.database().ref('playlists').child(playlistId).child('tracks')
-      tracksRef.child(videoId).set({
-        position: index,
-        info: videoInfo.val() || {}
-      })
+            const tracksRef = admin.database().ref('playlists').child(playlistId).child('tracks')
+            await tracksRef.child(videoId).set({
+              position: index,
+              info: videoInfo.val() || {}
+            })
+          }
+        )() // asyncだけだと関数を渡していることになる。無名関数を実行して上げる必要があるので注意
+      )
     }
+    return Promise.all(promises)
   },
 
   updateVideoInfo: async (admin, videoId) => {
@@ -101,6 +112,7 @@ const UpdateDB = {
       publishedAt: item.snippet.publishedAt || '',
       thumbnails: item.snippet.thumbnails || {}
     })
+    return 'resolved!'
   }
 }
 
