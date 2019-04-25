@@ -1,0 +1,30 @@
+.title-logo {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 800;
+  font-size: xx-large;
+  color: white;
+}
+
+a.navbar-item:hover, a.navbar-item.is-active, .navbar-link:hover, .navbar-link.is-active {
+  color: #4a4a4a;
+}
+
+
+.navbar.header {
+  background: lightgray;
+}
+
+body {
+  color: #4a4a4a;
+  background: lightgray;
+}
+
+a {
+  color: white;
+}
+
+.iframe-youtube {
+  width: 100%;
+  height: 300px;
+  background: black;
+}

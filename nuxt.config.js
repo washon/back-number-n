@@ -2,7 +2,7 @@ import pkg from './package'
 
 require('dotenv').config()
 export default {
-  mode: 'universal',
+  mode: 'spa',
 
   /*
   ** Headers of the page
@@ -15,7 +15,8 @@ export default {
       { hid: 'description', name: 'description', content: pkg.description }
     ],
     link: [
-      { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
+      { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
+      { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css?family=Montserrat:400,700,800,900' }
     ]
   },
 
@@ -28,6 +29,7 @@ export default {
   ** Global CSS
   */
   css: [
+    '@/assets/css/main.css'
   ],
 
   /*
