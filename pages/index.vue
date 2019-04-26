@@ -1,56 +1,35 @@
 <template>
   <section class="section">
     <div class="columns is-mobile">
-      <!--
-      <card
-        title="Free"
-        icon="github-circle"
-      >
-        Open source on <a href="https://github.com/buefy/buefy"> GitHub</a>
-      </card>
-
-      <card
-        title="Responsive"
-        icon="cellphone-link"
-      >
-        <b class="has-text-grey">Every</b> component is responsive
-      </card>
-
-      <card
-        title="Modern"
-        icon="alert-decagram"
-      >
-        Built with <a href="https://vuejs.org/">Vue.js</a> and <a href="http://bulma.io/">Bulma</a>
-      </card>
-      -->
       <div>
         <div v-for="playlist of playlists" :key="playlist.id">
-        <h3>
-          {{playlist.title}}
-        </h3>
-        <iframe
-          class="iframe-youtube"
-          v-bind:src="playlist.src"
-          frameborder="0"
-          allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
-          allowfullscreen>
-        </iframe>
-        <div class="nnn-yt-playlist-items">
-          <a
-            v-for="track of playlist.tracks"
-            :key="track.position"
-            v-bind:href="track.url"
-            class="nnn-yt-playlist-item"
-            target="_blank">
-            <div class="nnn-yt-playlist-id">{{ track.position }}</div>
-            <div
-             class="nnn-yt-playlist-thumbnail"
-             v-bind:style="{ background: 'url(' + track.thumbnail_url + ';)' }">
-             </div>
-            <div class="nnn-yt-playlist-title">{{ track.title }}</div>
-            <div class="nnn-yt-playlist-channel-title">{{ track.channelTitle }} </div>
-          </a>
-        </div>
+          <h3>
+            {{ playlist.title }}
+          </h3>
+          <iframe
+            class="iframe-youtube"
+            :src="playlist.src"
+            frameborder="0"
+            allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen
+          />
+          <div class="nnn-yt-playlist-items">
+            <a
+              v-for="track of playlist.tracks"
+              :key="track.position"
+              :href="track.url"
+              class="nnn-yt-playlist-item"
+              target="_blank"
+            >
+              <div class="nnn-yt-playlist-id">{{ track.position }}</div>
+              <div
+                class="nnn-yt-playlist-thumbnail"
+                :style="{ background: 'url(' + track.thumbnail_url + ';)' }"
+              />
+              <div class="nnn-yt-playlist-title">{{ track.title }}</div>
+              <div class="nnn-yt-playlist-channel-title">{{ track.channelTitle }} </div>
+            </a>
+          </div>
         </div>
       </div>
     </div>
@@ -58,14 +37,10 @@
 </template>
 
 <script>
-// import Card from '~/components/Card'
 import axios from 'axios'
 
 export default {
   name: 'HomePage',
-  // components: {
-  //   Card
-  // },
   async asyncData() {
     const apiUrl = process.env.BNN_API_URL
 
