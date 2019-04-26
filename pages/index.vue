@@ -43,6 +43,7 @@ export default {
   name: 'HomePage',
   async asyncData() {
     const apiUrl = process.env.BNN_API_URL
+    console.log(`will get from ${apiUrl}`)
 
     const res = await axios.get(`${apiUrl}/playlists`)
     console.log(res)
@@ -50,6 +51,7 @@ export default {
     console.log(_data)
     let playlists = []
     try {
+      console.log(process.env)
       playlists = _data.map((item) => {
         return {
           playlistId: item.playlistId,
