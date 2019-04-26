@@ -2,7 +2,7 @@ import pkg from './package'
 
 require('dotenv').config()
 export default {
-  mode: 'universal',
+  mode: 'universal', // spaにするとprocess.evnで環境変数が取れなくなるので注意！
 
   /*
   ** Headers of the page

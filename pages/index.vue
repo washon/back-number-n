@@ -43,15 +43,11 @@ export default {
   name: 'HomePage',
   async asyncData() {
     const apiUrl = process.env.BNN_API_URL
-    console.log(`will get from ${apiUrl}`)
 
     const res = await axios.get(`${apiUrl}/playlists`)
-    console.log(res)
     const _data = res.data
-    console.log(_data)
     let playlists = []
     try {
-      console.log(process.env)
       playlists = _data.map((item) => {
         return {
           playlistId: item.playlistId,
@@ -65,15 +61,13 @@ export default {
           })
         }
       })
-      console.log(playlists)
       playlists.forEach((playlist) => {
         playlist.tracks.sort((a, b) => { return a.position - b.position })
         playlist.src = `https://www.youtube.com/embed/?list=${playlist.playlistId}&v=${playlist.tracks[0].videoId}`
       })
     } catch (error) {
-      console.log(error)
+      console.error(error)
     }
-    console.log(playlists)
 
     return { playlists }
   }
