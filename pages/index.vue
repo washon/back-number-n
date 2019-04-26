@@ -48,24 +48,29 @@ export default {
     console.log(res)
     const _data = res.data
     console.log(_data)
-    const playlists = _data.map((item) => {
-      return {
-        playlistId: item.playlistId,
-        title: item.title,
-        tracks: Object.values(item.tracks).map((track) => {
-          return Object.assign(track.info || {}, {
-            position: track.position + 1,
-            url: `https://www.youtube.com/watch?v=${(track.info || {}).videoId}`,
-            thumbnail_url: ((track.thumbnails || {}).medium || {}).url
+    let playlists = []
+    try {
+      const playlists = _data.map((item) => {
+        return {
+          playlistId: item.playlistId,
+          title: item.title,
+          tracks: Object.values(item.tracks).map((track) => {
+            return Object.assign(track.info || {}, {
+              position: track.position + 1,
+              url: `https://www.youtube.com/watch?v=${(track.info || {}).videoId}`,
+              thumbnail_url: ((track.thumbnails || {}).medium || {}).url
+            })
           })
-        })
-      }
-    })
-    console.log(playlists)
-    playlists.forEach((playlist) => {
-      playlist.tracks.sort((a, b) => { return a.position - b.position })
-      playlist.src = `https://www.youtube.com/embed/?list=${playlist.playlistId}&v=${playlist.tracks[0].videoId}`
-    })
+        }
+      })
+      console.log(playlists)
+      playlists.forEach((playlist) => {
+        playlist.tracks.sort((a, b) => { return a.position - b.position })
+        playlist.src = `https://www.youtube.com/embed/?list=${playlist.playlistId}&v=${playlist.tracks[0].videoId}`
+      })
+    } catch (error) {
+      console.log(erorr)
+    }
     console.log(playlists)
 
     return { playlists }
