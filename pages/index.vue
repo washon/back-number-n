@@ -50,7 +50,7 @@ export default {
     console.log(_data)
     let playlists = []
     try {
-      const playlists = _data.map((item) => {
+      playlists = _data.map((item) => {
         return {
           playlistId: item.playlistId,
           title: item.title,
@@ -69,7 +69,7 @@ export default {
         playlist.src = `https://www.youtube.com/embed/?list=${playlist.playlistId}&v=${playlist.tracks[0].videoId}`
       })
     } catch (error) {
-      console.log(erorr)
+      console.log(error)
     }
     console.log(playlists)
 
