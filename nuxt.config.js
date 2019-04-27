@@ -46,7 +46,8 @@ export default {
     // Doc: https://axios.nuxtjs.org/usage
     '@nuxtjs/axios',
     // Doc: https://buefy.github.io/#/documentation
-    'nuxt-buefy'
+    'nuxt-buefy',
+    '@nuxtjs/google-analytics', { id: process.env.GOOGLE_ANALYTICS_TRACKING_ID }
   ],
   /*
   ** Axios module configuration
