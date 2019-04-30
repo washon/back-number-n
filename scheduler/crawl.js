@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 const admin = require('firebase-admin')
 const UpdateDB = require('./updatedb')
+require('dotenv').config()
 
 function initAdmin(admin) {
   admin.initializeApp({

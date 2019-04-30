@@ -1,11 +1,14 @@
 const YouTubeAPI = require('./YouTubeAPI')
+require('dotenv').config()
 
 const UpdateDB = {
   DEFAULT_CHANNEL_ID: process.env.DEFAULT_CHANNEL_ID,
+  ROOT_KEY: 'v1',
   update: async (admin) => {
     let ownPlaylists = []
 
-    const query = admin.database().ref('playlists').orderByChild('publishedAt')
+    const rootRef = admin.database().ref(UpdateDB.ROOT_KEY)
+    const query = rootRef.child('playlists').orderByChild('publishedAt')
     const snapshot = await query.once('value')
     snapshot.forEach((childSnapshot) => {
       const playlist = childSnapshot.val()
@@ -13,15 +16,15 @@ const UpdateDB = {
     })
     ownPlaylists = ownPlaylists.reverse()
 
-    return UpdateDB.updatePlaylists(admin, ownPlaylists)
+    return UpdateDB.updatePlaylists(rootRef, ownPlaylists)
   },
 
-  updatePlaylists: async (admin, ownPlaylists) => {
+  updatePlaylists: async (rootRef, ownPlaylists) => {
     const channelId = UpdateDB.DEFAULT_CHANNEL_ID
     const ytPlaylists = await YouTubeAPI.getPlaylists(channelId)
 
     const promises = []
-    const MAX_COUNT = 1
+    const MAX_COUNT = 10
     let count = 0
     for (const item of ytPlaylists.items) {
       if (count > MAX_COUNT) {
@@ -34,7 +37,7 @@ const UpdateDB = {
         count++
         console.log(`add Playlist : ${item.id}`)
 
-        const playlistsRef = admin.database().ref('playlists')
+        const playlistsRef = rootRef.child('playlists')
         playlistsRef.child(item.id).set({
           kind: item.kind,
           playlistId: item.id,
@@ -45,16 +48,16 @@ const UpdateDB = {
           thumbnails: item.snippet.thumbnails
         })
 
-        promises.push(UpdateDB.updatePlaylistItems(admin, item.id))
+        promises.push(UpdateDB.updatePlaylistItems(rootRef, item.id))
       }
     }
     return Promise.all(promises)
   },
 
-  updatePlaylistItems: async (admin, playlistId) => {
-    const query = admin.database().ref('playlists').orderByKey().equalTo(playlistId)
+  updatePlaylistItems: async (rootRef, playlistId) => {
+    const query = rootRef.child('playlist_tracks').orderByKey().equalTo(playlistId)
     const snapshot = await query.once('value')
-    if (snapshot.val().tracks !== undefined) {
+    if ((snapshot.val() || {}).tracks !== undefined) {
       return
     }
     const playlistItems = await YouTubeAPI.getPlaylistItems(playlistId).catch((err) => {
@@ -68,14 +71,14 @@ const UpdateDB = {
       promises.push(
         (
           async () => {
-            const queryVideos = admin.database().ref('videos').child(videoId)
+            const queryVideos = rootRef.child('videos').child(videoId)
             let videoInfo = await queryVideos.once('value')
             if (videoInfo.val() === null) {
-              await UpdateDB.updateVideoInfo(admin, videoId)
+              await UpdateDB.updateVideoInfo(rootRef, videoId)
               videoInfo = await queryVideos.once('value')
             }
 
-            const tracksRef = admin.database().ref('playlists').child(playlistId).child('tracks')
+            const tracksRef = rootRef.child('playlist_tracks').child(playlistId).child('tracks')
             await tracksRef.child(videoId).set({
               position: index,
               info: videoInfo.val() || {}
@@ -87,7 +90,7 @@ const UpdateDB = {
     return Promise.all(promises)
   },
 
-  updateVideoInfo: async (admin, videoId) => {
+  updateVideoInfo: async (rootRef, videoId) => {
     const videos = await YouTubeAPI.getVideoInfo(videoId).catch((err) => {
       console.log(err)
     })
@@ -98,7 +101,7 @@ const UpdateDB = {
     const item = videos.items[0]
     console.log(`add videoInfo : ${item.id} `)
 
-    const videoRef = admin.database().ref('videos').child(videoId)
+    const videoRef = rootRef.child('videos').child(videoId)
     await videoRef.update({
       kind: item.kind,
       videoId: item.id,
