@@ -167,7 +167,7 @@ export default {
     height: 36px;
     float: left;
     margin: 6px 4px;
-    background-size: 64px 48px;
+    background-size: contain !important;
     background-position: center;
 }
 
