@@ -51,7 +51,6 @@ export default {
   name: 'HomePage',
   async asyncData() {
     const apiUrl = process.env.BNN_API_URL
-
     const res = await axios.get(`${apiUrl}/playlists`, {
       params: {
         from: 0,
@@ -83,15 +82,16 @@ export default {
     }
     console.log(playlists.length)
 
-    return { playlists }
+    return {
+      playlists,
+      apiUrl
+    }
   },
   methods: {
     infiniteHandler() {
       (async () => {
         console.log('start additional loading')
-        const apiUrl = process.env.BNN_API_URL
-
-        const res = await axios.get(`${apiUrl}/playlists`, {
+        const res = await axios.get(`${this.apiUrl}/playlists`, {
           params: {
             from: this.playlists.length,
             to: this.playlists.length + 5
