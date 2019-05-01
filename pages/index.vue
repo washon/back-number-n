@@ -2,8 +2,8 @@
   <section class="section">
     <div class="columns is-mobile">
       <div class="column">
-        <ul>
-          <li v-for="playlist of playlists" :key="playlist.playlistId">
+        <div id="grid-container">
+          <div class="grid-item" v-for="playlist of playlists" :key="playlist.playlistId">
             <h3>
               {{ playlist.title }}
             </h3>
@@ -31,8 +31,8 @@
                 <div class="nnn-yt-playlist-channel-title">{{ track.channelTitle }} </div>
               </a>
             </div>
-          </li>
-        </ul>
+          </div> <!-- grid-container -->
+        </div>
         <infinite-loading
           ref="infiniteLoading"
           spinner="spiral"
@@ -54,7 +54,7 @@ export default {
     const res = await axios.get(`${apiUrl}/playlists`, {
       params: {
         from: 0,
-        to: 5
+        to: 6
       }
     })
     const _data = res.data
@@ -94,7 +94,7 @@ export default {
         const res = await axios.get(`${this.apiUrl}/playlists`, {
           params: {
             from: this.playlists.length,
-            to: this.playlists.length + 5
+            to: this.playlists.length + 6
           }
         })
         const _data = res.data
@@ -185,6 +185,21 @@ export default {
     color: #bbb;
     max-height: 1.6em;
     overflow: hidden;
+}
+
+@media (min-width: 1540px) {
+  #grid-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, 600px);
+  }
+}
+@media (max-width: 1540px) {
+  #grid-container {
+    display: grid;
+  }
+}
+#grid-container .grid-item {
+  margin: 10px;
 }
 
 </style>
