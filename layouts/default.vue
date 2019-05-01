@@ -16,8 +16,8 @@
       </div>
     </nav>
 
-    <section class="main-content columns">
-      <div class="container column is-10">
+    <section class="main-content">
+      <div class="container" >
         <nuxt />
       </div>
     </section>
@@ -46,4 +46,29 @@ export default {
 </script>
 
 <style scoped>
+
+@media screen and (min-width: 1650px) {
+  .container {
+    max-width: 1540px;
+    width: 1540px;
+  }
+}
+@media screen and (min-width: 1730px) {
+  .container {
+    max-width: 1680px;
+    width: 1680px;
+  }
+}
+@media screen and (min-width: 1830px) {
+  .container {
+    max-width: 1780px;
+    width: 1780px;
+  }
+}
+@media screen and (min-width: 1920px) {
+  .container {
+    max-width: 1870px;
+    width: 1870px;
+  }
+}
 </style>

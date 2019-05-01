@@ -1,9 +1,9 @@
 <template>
-  <section class="section">
+  <div>
     <div class="columns is-mobile">
       <div class="column">
-        <div id="grid-container">
-          <div class="grid-item" v-for="playlist of playlists" :key="playlist.playlistId">
+        <div class="columns is-multiline">
+          <div class="column is-vertical is-half-tablet is-one-third-desktop" v-for="playlist of playlists" :key="playlist.playlistId">
             <h3>
               {{ playlist.title }}
             </h3>
@@ -41,7 +41,7 @@
         </infinite-loading>
       </div>
     </div>
-  </section>
+  </div>
 </template>
 
 <script>
@@ -80,7 +80,6 @@ export default {
     } catch (error) {
       console.error(error)
     }
-    console.log(playlists.length)
 
     return {
       playlists,
@@ -187,19 +186,8 @@ export default {
     overflow: hidden;
 }
 
-@media (min-width: 1540px) {
-  #grid-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, 600px);
-  }
-}
-@media (max-width: 1540px) {
-  #grid-container {
-    display: grid;
-  }
-}
-#grid-container .grid-item {
-  margin: 10px;
+.section {
+  padding: 0px !important;
 }
 
 </style>
