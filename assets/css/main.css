@@ -9,6 +9,10 @@ a.navbar-item:hover, a.navbar-item.is-active, .navbar-link:hover, .navbar-link.i
   color: #4a4a4a;
 }
 
+a.navbar-item.link-to-n:hover, a.navbar-item.link-to-n.is-active, .navbar-link.link-to-n:hover, .navbar-link.link-to-n.is-active {
+  color: #b80b00;
+}
+
 
 .navbar.header {
   background: lightgray;

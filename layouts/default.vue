@@ -8,12 +8,20 @@
       <div class="navbar-brand">
         <a
           class="navbar-item title-logo"
-          href="/"
         >
           back number N
         </a>
 
+        <a
+          class="navbar-item title-logo link-to-n"
+          style="font-size:smaller;font-weight:800;"
+          href="https://livehousen.wixsite.com/ff14n"
+          target="_blank"
+        >
+          Live House N
+        </a>
       </div>
+
     </nav>
 
     <section class="main-content">
