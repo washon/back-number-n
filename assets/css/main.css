@@ -28,3 +28,11 @@ a {
   height: 300px;
   background: black;
 }
+
+.title {
+  font-family: "M PLUS 1p";
+}
+
+.font-montserrat {
+  font-family: 'Montserrat', sans-serif;
+}

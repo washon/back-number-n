@@ -2,6 +2,60 @@
   <div>
     <div class="columns is-mobile">
       <div class="column">
+        <div style="margin: 20px 0">
+          <b-input
+            v-model="search"
+            @input="handlerSearchInput"
+            icon="magnify"
+            placeholder="キーワード検索 ( 動画のタイトル、チャンネル名 )"
+            :loading="searchPlaylistsGetting"
+            style="margin: 10px 0"
+          />
+          <b-notification
+            :closable="false"
+            v-if="isEmpltyHit"
+            >
+              「{{ search }}」はヒットしませんでした
+          </b-notification>
+          <h3
+            class="title is-4"
+            style="margin: 10px 0"
+            v-if="searchPlaylistsReady && search !== '' && !isEmpltyHit"
+            >
+            「{{ search }}」の検索結果 : {{ filterdPlaylistCount }}件
+            </h3>
+          <div id="search-results">
+            <div v-for="playlist of filteredPlaylists" :key="playlist.playlistId">
+              <h3>
+                {{ playlist.title }}
+              </h3>
+              <div class="nnn-yt-playlist-items">
+                <a
+                  v-for="track of playlist.tracks"
+                  :key="track.position"
+                  :href="track.url"
+                  class="nnn-yt-playlist-item"
+                  target="_blank"
+                >
+                  <div class="nnn-yt-playlist-id">{{ track.position }}</div>
+                  <div
+                    class="nnn-yt-playlist-thumbnail"
+                    :style="{ background: 'url(' + track.thumbnail_url + ';)' }"
+                  />
+                  <div class="nnn-yt-playlist-title" v-html="track.title" />
+                  <div class="nnn-yt-playlist-channel-title" v-html="track.channelTitle" />
+                </a>
+              </div>
+            </div> <!-- grid-container -->
+          </div>
+        </div>
+
+        <h3
+          class="title is-4 font-montserrat"
+          style="margin-top:30px;margin-bottom:10px"
+        >
+        back number
+        </h3>
         <div class="columns is-multiline">
           <div class="column is-vertical is-half-tablet is-one-third-desktop" v-for="playlist of playlists" :key="playlist.playlistId">
             <h3>
@@ -45,41 +99,65 @@
 </template>
 
 <script>
+import { getPlaylists } from '~/common/playlistsapi'
 import axios from 'axios'
 
 export default {
   name: 'HomePage',
+  data() {
+    return {
+      search: '',
+      searchPlaylists: null,
+      searchPlaylistsGetting: false,
+      searchPlaylistsReady: false
+    }
+  },
+  computed: {
+    isEmpltyHit() {
+      if (!this.searchPlaylistsReady) {
+        return false
+      }
+      if (!this.search) {
+        return false
+      }
+      return this.filteredPlaylists.length === 0
+    },
+    filteredPlaylists() {
+      if (!this.search) {
+        return []
+      }
+      if (!this.searchPlaylists) {
+        return []
+      }
+      return this.searchPlaylists.map((playlist) => {
+        const _pl = JSON.parse(JSON.stringify(playlist))
+        _pl.tracks = _pl.tracks.filter((track) => {
+          return (track.title || '').toLowerCase().includes(this.search.toLowerCase()) ||
+          (track.channelTitle || '').toLowerCase().includes(this.search.toLowerCase())
+        })
+        _pl.tracks.forEach((track) => {
+          track.title = track.title.replace(new RegExp(this.search, 'i'), '<span class="search-hit">$&</span>')
+          track.channelTitle = track.channelTitle.replace(new RegExp(this.search, 'i'), '<span class="search-hit">$&</span>')
+        })
+
+        return _pl
+      }).filter((playlist) => {
+        return playlist.tracks.length > 0
+      })
+    },
+    filterdPlaylistCount() {
+      let count = 0
+      if (this.filteredPlaylists) {
+        this.filteredPlaylists.forEach((playlist) => {
+          count += playlist.tracks.length
+        })
+      }
+      return count
+    }
+  },
   async asyncData() {
     const apiUrl = process.env.BNN_API_URL
-    const res = await axios.get(`${apiUrl}/playlists`, {
-      params: {
-        from: 0,
-        to: 6
-      }
-    })
-    const _data = res.data
-    let playlists = []
-    try {
-      playlists = _data.map((item) => {
-        return {
-          playlistId: item.playlistId,
-          title: item.title,
-          tracks: Object.values(item.tracks).map((track) => {
-            return Object.assign(track.info || {}, {
-              position: track.position + 1,
-              url: `https://www.youtube.com/watch?v=${(track.info || {}).videoId}`,
-              thumbnail_url: ((track.thumbnails || {}).medium || {}).url
-            })
-          })
-        }
-      })
-      playlists.forEach((playlist) => {
-        playlist.tracks.sort((a, b) => { return a.position - b.position })
-        playlist.src = `https://www.youtube.com/embed/?list=${playlist.playlistId}&v=${playlist.tracks[0].videoId}`
-      })
-    } catch (error) {
-      console.error(error)
-    }
+    const playlists = await getPlaylists(apiUrl, { from: 0, to: 6 })
 
     return {
       playlists,
@@ -87,38 +165,21 @@ export default {
     }
   },
   methods: {
+    async handlerSearchInput(e) {
+      if (!this.searchPlaylistsReady) {
+        this.searchPlaylistsGetting = true
+        this.searchPlaylists = await getPlaylists(this.apiUrl)
+        this.searchPlaylistsReady = true
+        this.searchPlaylistsGetting = false
+      }
+    },
     infiniteHandler() {
       (async () => {
         console.log('start additional loading')
-        const res = await axios.get(`${this.apiUrl}/playlists`, {
-          params: {
-            from: this.playlists.length,
-            to: this.playlists.length + 6
-          }
+        const playlists = await getPlaylists(this.apiUrl, {
+          from: this.playlists.length,
+          to: this.playlists.length + 6
         })
-        const _data = res.data
-        let playlists = []
-        try {
-          playlists = _data.map((item) => {
-            return {
-              playlistId: item.playlistId,
-              title: item.title,
-              tracks: Object.values(item.tracks).map((track) => {
-                return Object.assign(track.info || {}, {
-                  position: track.position + 1,
-                  url: `https://www.youtube.com/watch?v=${(track.info || {}).videoId}`,
-                  thumbnail_url: ((track.thumbnails || {}).medium || {}).url
-                })
-              })
-            }
-          })
-          playlists.forEach((playlist) => {
-            playlist.tracks.sort((a, b) => { return a.position - b.position })
-            playlist.src = `https://www.youtube.com/embed/?list=${playlist.playlistId}&v=${playlist.tracks[0].videoId}`
-          })
-        } catch (error) {
-          console.error(error)
-        }
 
         if (playlists.length > 0) {
           this.playlists = this.playlists.concat(playlists)
@@ -188,6 +249,10 @@ export default {
 
 .section {
   padding: 0px !important;
+}
+
+#search-results >>> .search-hit {
+  background-color: orangered;
 }
 
 </style>
