@@ -12,7 +12,7 @@ export async function getPlaylists(apiUrl, params) {
         tracks: Object.values(item.tracks).map((track) => {
           return Object.assign(track.info || {}, {
             position: track.position + 1,
-            url: `https://www.youtube.com/watch?v=${(track.info || {}).videoId}`,
+            url: `https://www.youtube.com/watch?list=${item.playlistId}&v=${(track.info || {}).videoId}`,
             thumbnail_url: ((track.thumbnails || {}).medium || {}).url
           })
         })
