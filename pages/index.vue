@@ -61,20 +61,21 @@
             <h3>
               {{ playlist.title }}
             </h3>
-            <iframe
+            <youtube
+              ref="youtube"
               class="iframe-youtube"
-              :src="playlist.src"
-              frameborder="0"
-              allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
-              allowfullscreen
+              :id="'player-' + playlist.playlistId"
+              :player-vars="{ list: playlist.playlistId, v:playlist.firstVideoId }"
+              @ready="playlistReady"
+              @playing="playlistPlaying"
             />
             <div class="nnn-yt-playlist-items">
               <a
                 v-for="track of playlist.tracks"
                 :key="track.position"
-                :href="track.url"
                 class="nnn-yt-playlist-item"
-                target="_blank"
+                :class="{ playing: track.playing }"
+                @click="handerClickVideo(playlist.playlistId, track.position)"
               >
                 <div class="nnn-yt-playlist-id">{{ track.position }}</div>
                 <div
@@ -109,7 +110,8 @@ export default {
       search: '',
       searchPlaylists: null,
       searchPlaylistsGetting: false,
-      searchPlaylistsReady: false
+      searchPlaylistsReady: false,
+      players: {}
     }
   },
   computed: {
@@ -188,6 +190,28 @@ export default {
           this.$refs.infiniteLoading.stateChanger.complete()
         }
       })()
+    },
+    playlistReady(e) {
+      this.players[e.getPlaylistId()] = e
+    },
+    playlistPlaying(e) {
+      const playlistId = e.getPlaylistId()
+      const videoId = e.getVideoData().video_id
+      for (let ip = 0; ip < this.playlists.length; ip++) {
+        const playlist = this.playlists[ip]
+        if (playlist.playlistId === playlistId) {
+          for (let it = 0; it < playlist.tracks.length; it++) {
+            const track = playlist.tracks[it]
+            track.playing = track.videoId === videoId
+          }
+          break
+        }
+      }
+    },
+    handerClickVideo(playlistId, trackPos) {
+      if (playlistId in this.players) {
+        this.players[playlistId].playVideoAt(trackPos - 1)
+      }
     }
   }
 }
@@ -206,6 +230,10 @@ export default {
     display: block;
     color: white;
     padding: 4px;
+}
+
+.nnn-yt-playlist-item.playing {
+    background-color: darkred;
 }
 
 .nnn-yt-playlist-item:hover {
