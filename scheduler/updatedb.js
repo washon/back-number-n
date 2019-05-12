@@ -5,68 +5,71 @@ const UpdateDB = {
   DEFAULT_CHANNEL_ID: process.env.DEFAULT_CHANNEL_ID,
   ROOT_KEY: 'v1',
   update: async (admin) => {
-    let ownPlaylists = []
-
     const rootRef = admin.database().ref(UpdateDB.ROOT_KEY)
-    const query = rootRef.child('playlists').orderByChild('publishedAt')
-    const snapshot = await query.once('value')
-    snapshot.forEach((childSnapshot) => {
-      const playlist = childSnapshot.val()
-      ownPlaylists.push(playlist)
-    })
-    ownPlaylists = ownPlaylists.reverse()
-
-    return UpdateDB.updatePlaylists(rootRef, ownPlaylists)
+    const res = await UpdateDB.updatePlaylists(rootRef)
+    return res
   },
 
-  updatePlaylists: async (rootRef, ownPlaylists) => {
+  updatePlaylists: async (rootRef) => {
     const channelId = UpdateDB.DEFAULT_CHANNEL_ID
     const ytPlaylists = await YouTubeAPI.getPlaylists(channelId)
 
     const promises = []
     const MAX_COUNT = 10
     let count = 0
-    for (const item of ytPlaylists.items) {
-      if (count > MAX_COUNT) {
+    for (const item of ytPlaylists) {
+      if (count >= MAX_COUNT) {
         console.log('Stopping update playlists, cause too many updatable playlist.')
         return Promise.all(promises)
       }
+      const playlistId = item.id
 
-      const hasPlaylist = (ownPlaylists || []).some(e => (e.playlistId === item.id))
-      if (!hasPlaylist) {
+      // 実際のplaylistの中の動画数を取得
+      const playlistItems = await YouTubeAPI.getPlaylistItems(playlistId).catch((err) => {
+        console.log(err)
+      })
+
+      // DBに保存されているplaylistの中での動画数を取得
+      const queryTracks = rootRef.child('playlist_tracks').orderByKey().equalTo(playlistId)
+      const ssTracks = await queryTracks.once('value')
+      const ownTracks = ((ssTracks.val() || {})[playlistId] || {}).tracks || {}
+
+      // javascriptで連想配列のlengthは取れない
+      const ownTracksLength = (Object.keys(ownTracks) || []).length
+      console.log(`cmp length : ${playlistItems.length} > ${ownTracksLength} = ${playlistItems.length > ownTracksLength}`)
+
+      if (playlistItems.length > ownTracksLength) {
         count++
-        console.log(`add Playlist : ${item.id}`)
+        console.log(`upsert playlist_tracks : ${playlistId}`)
+        promises.push(UpdateDB.updatePlaylistItems(rootRef, playlistId, playlistItems, ownTracks))
+      }
 
+      const queryPlaylist = rootRef.child('playlists').orderByKey().equalTo(playlistId)
+      const ssPlaylist = await queryPlaylist.once('value')
+      if (!ssPlaylist.val()) {
+        console.log(`add playlist info : ${playlistId}`)
         const playlistsRef = rootRef.child('playlists')
-        playlistsRef.child(item.id).set({
+        playlistsRef.child(playlistId).set({
           kind: item.kind,
-          playlistId: item.id,
+          playlistId: playlistId,
           channelTitle: item.snippet.channelTitle,
           title: item.snippet.title,
           description: item.snippet.description,
           publishedAt: item.snippet.publishedAt,
           thumbnails: item.snippet.thumbnails
         })
-
-        promises.push(UpdateDB.updatePlaylistItems(rootRef, item.id))
       }
     }
     return Promise.all(promises)
   },
 
-  updatePlaylistItems: async (rootRef, playlistId) => {
-    const query = rootRef.child('playlist_tracks').orderByKey().equalTo(playlistId)
-    const snapshot = await query.once('value')
-    if ((snapshot.val() || {}).tracks !== undefined) {
-      return
-    }
-    const playlistItems = await YouTubeAPI.getPlaylistItems(playlistId).catch((err) => {
-      console.log(err)
-    })
-
+  updatePlaylistItems: (rootRef, playlistId, ytPlaylistItems, ownTracks) => {
     const promises = []
-    for (const [index, item] of playlistItems.items.entries()) {
+    for (const [index, item] of ytPlaylistItems.entries()) {
       const videoId = item.contentDetails.videoId
+      if (ownTracks && videoId in ownTracks) {
+        continue
+      }
 
       promises.push(
         (
@@ -78,6 +81,7 @@ const UpdateDB = {
               videoInfo = await queryVideos.once('value')
             }
 
+            console.log(`add track ${videoId} into ${playlistId}`)
             const tracksRef = rootRef.child('playlist_tracks').child(playlistId).child('tracks')
             await tracksRef.child(videoId).set({
               position: index,
@@ -113,7 +117,9 @@ const UpdateDB = {
 
       tags: item.snippet.tags || [],
       publishedAt: item.snippet.publishedAt || '',
-      thumbnails: item.snippet.thumbnails || {}
+      thumbnails: item.snippet.thumbnails || {},
+
+      duration: (item.contentDetails || {}).duration || ''
     })
     return 'resolved!'
   }

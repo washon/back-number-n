@@ -44,6 +44,10 @@
                   />
                   <div class="nnn-yt-playlist-title" v-html="track.title" />
                   <div class="nnn-yt-playlist-channel-title" v-html="track.channelTitle" />
+                  <span
+                    class="nnn-yt-playlist-duration">
+                    {{ track.durationStr }}
+                  </span>
                 </a>
               </div>
             </div> <!-- grid-container -->
@@ -60,6 +64,9 @@
           <div class="column is-vertical is-half-tablet is-one-third-desktop" v-for="playlist of playlists" :key="playlist.playlistId">
             <h3>
               {{ playlist.title }}
+            <span class="tag is-dark" style="float:right;">
+              {{ playlist.totalDurationStr }}
+            </span>
             </h3>
             <youtube
               ref="youtube"
@@ -83,7 +90,12 @@
                   :style="{ background: 'url(' + track.thumbnail_url + ';)' }"
                 />
                 <div class="nnn-yt-playlist-title">{{ track.title }}</div>
-                <div class="nnn-yt-playlist-channel-title">{{ track.channelTitle }} </div>
+                <div class="nnn-yt-playlist-channel-title">{{ track.channelTitle }}
+                </div>
+                <span
+                  class="nnn-yt-playlist-duration">
+                  {{ track.durationStr }}
+                </span>
               </a>
             </div>
           </div> <!-- grid-container -->
@@ -193,6 +205,9 @@ export default {
     },
     playlistReady(e) {
       this.players[e.getPlaylistId()] = e
+      console.log(e)
+      console.log(e.getVideoData())
+      console.log(this.playlists)
     },
     playlistPlaying(e) {
       const playlistId = e.getPlaylistId()
@@ -230,6 +245,7 @@ export default {
     display: block;
     color: white;
     padding: 4px;
+    position: relative;
 }
 
 .nnn-yt-playlist-item.playing {
@@ -273,6 +289,22 @@ export default {
     color: #bbb;
     max-height: 1.6em;
     overflow: hidden;
+}
+
+.nnn-yt-playlist-duration {
+    font-size: 50%;
+    color: #444;
+    position: absolute;
+    right: 8px;
+    bottom: 4px;
+}
+
+.playing > .nnn-yt-playlist-duration {
+    color: #bbb;
+}
+
+.nnn-yt-playlist-item:hover > .nnn-yt-playlist-duration {
+    color: #bbb;
 }
 
 .section {
