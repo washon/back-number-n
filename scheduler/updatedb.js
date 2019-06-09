@@ -15,7 +15,7 @@ const UpdateDB = {
     const ytPlaylists = await YouTubeAPI.getPlaylists(channelId)
 
     const promises = []
-    const MAX_COUNT = 10
+    const MAX_COUNT = 3
     let count = 0
     for (const item of ytPlaylists) {
       if (count >= MAX_COUNT) {
