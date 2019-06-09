@@ -25,6 +25,7 @@ const UpdateDB = {
       const playlistId = item.id
 
       // 実際のplaylistの中の動画数を取得
+      count++ // etagで判定すればこのカウントはいらないけど、とりあえず。
       const playlistItems = await YouTubeAPI.getPlaylistItems(playlistId).catch((err) => {
         console.log(err)
       })
