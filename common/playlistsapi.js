@@ -9,6 +9,7 @@ export async function getPlaylists(apiUrl, params) {
       return {
         playlistId: item.playlistId,
         title: item.title,
+        publishedAt: item.publishedAt,
         tracks: Object.values(item.tracks).map((track) => {
           const trackInfo = track.info || {}
           return Object.assign(trackInfo, {

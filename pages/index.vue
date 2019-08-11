@@ -26,6 +26,11 @@
             </h3>
           <div id="search-results">
             <div v-for="playlist of filteredPlaylists" :key="playlist.playlistId">
+              <b-tooltip type="is-dark" label="playlist作成日 | total再生時間" style="float:right;">
+                <span class="tag is-dark">
+                  {{ (new Date(playlist.publishedAt)).toLocaleDateString() }} | {{ playlist.totalDurationStr }}
+                </span>
+              </b-tooltip>
               <h3>
                 {{ playlist.title }}
               </h3>
@@ -61,12 +66,15 @@
         back number
         </h3>
         <div class="columns is-multiline">
+
           <div class="column is-vertical is-half-tablet is-one-third-desktop" v-for="playlist of playlists" :key="playlist.playlistId">
             <h3>
               {{ playlist.title }}
-            <span class="tag is-dark" style="float:right;">
-              {{ playlist.totalDurationStr }}
-            </span>
+              <b-tooltip type="is-dark" label="playlist作成日 | total再生時間" style="float:right;">
+                <span class="tag is-dark">
+                  {{ (new Date(playlist.publishedAt)).toLocaleDateString() }} | {{ playlist.totalDurationStr }}
+                </span>
+              </b-tooltip>
             </h3>
             <youtube
               ref="youtube"
