@@ -17,6 +17,14 @@
             >
               「{{ search }}」はヒットしませんでした
           </b-notification>
+          <b-notification
+            :closable="false"
+            v-if="searchPlaylistsGetting"
+            :loading="searchPlaylistsGetting"
+            >
+              検索対象データの取得中...
+              <b-loading :is-full-page="false" :active.sync="searchPlaylistsGetting" :can-cancel="true"></b-loading>
+          </b-notification>
           <h3
             class="title is-4"
             style="margin: 10px 0"
@@ -161,24 +169,20 @@ export default {
       if (!this.searchPlaylists) {
         return []
       }
-      const _searchL = this.search.toLowerCase().trim()
+      const _searchL = this.search.toLowerCase().trim().split(' ')
       return this.searchPlaylists.map((playlist) => {
         const _pl = JSON.parse(JSON.stringify(playlist))
-        if ((_pl.title || '').toLowerCase().includes(_searchL)) {
-          _pl.title = _pl.title.replace(new RegExp(_searchL, 'i'), '<span class="search-hit">$&</span>')
+        if (this.hitsAllMultipleConditions(_pl.title, _searchL)) {
+          _pl.title = _pl.title.replace(new RegExp(_searchL.join('|'), 'ig'), '<span class="search-hit">$&</span>')
         } else {
           _pl.tracks = _pl.tracks.filter((track) => {
-            return (track.title || '').toLowerCase().includes(_searchL) ||
-            (track.channelTitle || '').toLowerCase().includes(_searchL)
+            return this.hitsAllMultipleConditions(track.title, _searchL) ||
+            this.hitsAllMultipleConditions(track.channelTitle, _searchL)
           })
         }
         _pl.tracks.forEach((track) => {
-          if (track.title) {
-            track.title = track.title.replace(new RegExp(_searchL, 'i'), '<span class="search-hit">$&</span>')
-          }
-          if (track.channelTitle) {
-            track.channelTitle = track.channelTitle.replace(new RegExp(_searchL, 'i'), '<span class="search-hit">$&</span>')
-          }
+          track.title = (track.title || '').replace(new RegExp(_searchL.join('|'), 'ig'), '<span class="search-hit">$&</span>')
+          track.channelTitle = (track.channelTitle || '').replace(new RegExp(_searchL.join('|'), 'ig'), '<span class="search-hit">$&</span>')
         })
 
         return _pl
@@ -214,6 +218,11 @@ export default {
         this.searchPlaylistsReady = true
         this.searchPlaylistsGetting = false
       }
+    },
+    hitsAllMultipleConditions(title, conditions) {
+      return conditions.every((c) => {
+        return (title || '').toLowerCase().includes(c.toLowerCase())
+      })
     },
     infiniteHandler() {
       (async () => {
