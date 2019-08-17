@@ -15,6 +15,8 @@ export async function getPlaylists(apiUrl, params) {
           return Object.assign(trackInfo, {
             position: track.position + 1,
             videoId: trackInfo.videoId,
+            title: trackInfo.title || 'unreachable',
+            channelTitle: trackInfo.channelTitle || 'unreachable',
             url: `https://www.youtube.com/watch?list=${item.playlistId}&v=${trackInfo.videoId}`,
             thumbnail_url: ((track.thumbnails || {}).medium || {}).url,
             playing: track.position === 0,
@@ -27,6 +29,7 @@ export async function getPlaylists(apiUrl, params) {
     playlists.forEach((playlist) => {
       playlist.tracks.sort((a, b) => { return a.position - b.position })
       playlist.src = `https://www.youtube.com/embed/?list=${playlist.playlistId}&v=${playlist.tracks[0].videoId}`
+      playlist.url = `https://www.youtube.com/watch?list=${playlist.playlistId}&v=${playlist.tracks[0].videoId}`
       playlist.firstVideoId = playlist.tracks[0].videoId
       playlist.totalDuration = playlist.tracks
         .map((e) => { return e.durationSec })

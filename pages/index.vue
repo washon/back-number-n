@@ -31,7 +31,13 @@
                   {{ (new Date(playlist.publishedAt)).toLocaleDateString() }} | {{ playlist.totalDurationStr }}
                 </span>
               </b-tooltip>
-              <h3 v-html="playlist.title" />
+              <a
+                class="nnn-yt-playlist-t"
+                :href="playlist.url"
+                target="_blank"
+              >
+                <h3 v-html="playlist.title" />
+              </a>
               <div class="nnn-yt-playlist-items">
                 <a
                   v-for="track of playlist.tracks"
@@ -67,7 +73,13 @@
 
           <div class="column is-vertical is-half-tablet is-one-third-desktop" v-for="playlist of playlists" :key="playlist.playlistId">
             <h3>
+              <a
+                class="nnn-yt-playlist-t"
+                :href="playlist.url"
+                target="_blank"
+              >
               {{ playlist.title }}
+              </a>
               <b-tooltip type="is-dark" label="playlist作成日 | total再生時間" style="float:right;">
                 <span class="tag is-dark">
                   {{ (new Date(playlist.publishedAt)).toLocaleDateString() }} | {{ playlist.totalDurationStr }}
@@ -187,6 +199,7 @@ export default {
   async asyncData() {
     const apiUrl = process.env.BNN_API_URL
     const playlists = await getPlaylists(apiUrl, { from: 0, to: 6 })
+    console.log(playlists)
 
     return {
       playlists,
@@ -220,9 +233,6 @@ export default {
     },
     playlistReady(e) {
       this.players[e.getPlaylistId()] = e
-      console.log(e)
-      console.log(e.getVideoData())
-      console.log(this.playlists)
     },
     playlistPlaying(e) {
       const playlistId = e.getPlaylistId()
@@ -251,7 +261,6 @@ export default {
 
 .nnn-yt-playlist-t {
     color: #141414;
-    font-family: auto;
 }
 
 .nnn-yt-playlist-item {
