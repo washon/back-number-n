@@ -7,7 +7,7 @@
             v-model="search"
             @input="handlerSearchInput"
             icon="magnify"
-            placeholder="キーワード検索 ( 動画のタイトル、チャンネル名、プレイリスト名 )"
+            placeholder="(プレイリスト名、動画タイトル、チャンネル名) によるキーワード検索"
             :loading="searchPlaylistsGetting"
             style="margin: 10px 0"
           />
