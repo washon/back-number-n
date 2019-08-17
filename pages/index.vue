@@ -149,7 +149,7 @@ export default {
       if (!this.searchPlaylists) {
         return []
       }
-      const _searchL = this.search.toLowerCase()
+      const _searchL = this.search.toLowerCase().trim()
       return this.searchPlaylists.map((playlist) => {
         const _pl = JSON.parse(JSON.stringify(playlist))
         if ((_pl.title || '').toLowerCase().includes(_searchL)) {
