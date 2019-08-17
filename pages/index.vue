@@ -7,7 +7,7 @@
             v-model="search"
             @input="handlerSearchInput"
             icon="magnify"
-            placeholder="キーワード検索 ( 動画のタイトル、チャンネル名 )"
+            placeholder="キーワード検索 ( 動画のタイトル、チャンネル名、プレイリスト名 )"
             :loading="searchPlaylistsGetting"
             style="margin: 10px 0"
           />
@@ -31,9 +31,7 @@
                   {{ (new Date(playlist.publishedAt)).toLocaleDateString() }} | {{ playlist.totalDurationStr }}
                 </span>
               </b-tooltip>
-              <h3>
-                {{ playlist.title }}
-              </h3>
+              <h3 v-html="playlist.title" />
               <div class="nnn-yt-playlist-items">
                 <a
                   v-for="track of playlist.tracks"
@@ -151,15 +149,24 @@ export default {
       if (!this.searchPlaylists) {
         return []
       }
+      const _searchL = this.search.toLowerCase()
       return this.searchPlaylists.map((playlist) => {
         const _pl = JSON.parse(JSON.stringify(playlist))
-        _pl.tracks = _pl.tracks.filter((track) => {
-          return (track.title || '').toLowerCase().includes(this.search.toLowerCase()) ||
-          (track.channelTitle || '').toLowerCase().includes(this.search.toLowerCase())
-        })
+        if ((_pl.title || '').toLowerCase().includes(_searchL)) {
+          _pl.title = _pl.title.replace(new RegExp(_searchL, 'i'), '<span class="search-hit">$&</span>')
+        } else {
+          _pl.tracks = _pl.tracks.filter((track) => {
+            return (track.title || '').toLowerCase().includes(_searchL) ||
+            (track.channelTitle || '').toLowerCase().includes(_searchL)
+          })
+        }
         _pl.tracks.forEach((track) => {
-          track.title = track.title.replace(new RegExp(this.search, 'i'), '<span class="search-hit">$&</span>')
-          track.channelTitle = track.channelTitle.replace(new RegExp(this.search, 'i'), '<span class="search-hit">$&</span>')
+          if (track.title) {
+            track.title = track.title.replace(new RegExp(_searchL, 'i'), '<span class="search-hit">$&</span>')
+          }
+          if (track.channelTitle) {
+            track.channelTitle = track.channelTitle.replace(new RegExp(_searchL, 'i'), '<span class="search-hit">$&</span>')
+          }
         })
 
         return _pl
@@ -321,6 +328,7 @@ export default {
 
 #search-results >>> .search-hit {
   background-color: orangered;
+  color: white;
 }
 
 </style>
