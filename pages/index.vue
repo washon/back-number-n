@@ -5,33 +5,33 @@
         <div style="margin: 20px 0">
           <b-input
             v-model="search"
-            @input="handlerSearchInput"
             icon="magnify"
             placeholder="(プレイリスト名、動画タイトル、チャンネル名) によるキーワード検索"
             :loading="searchPlaylistsGetting"
             style="margin: 10px 0"
+            @input="handlerSearchInput"
           />
           <b-notification
-            :closable="false"
             v-if="isEmpltyHit"
-            >
-              「{{ search }}」はヒットしませんでした
+            :closable="false"
+          >
+            「{{ search }}」はヒットしませんでした
           </b-notification>
           <b-notification
-            :closable="false"
             v-if="searchPlaylistsGetting"
+            :closable="false"
             :loading="searchPlaylistsGetting"
-            >
-              検索対象データの取得中...
-              <b-loading :is-full-page="false" :active.sync="searchPlaylistsGetting" :can-cancel="true"></b-loading>
+          >
+            検索対象データの取得中...
+            <b-loading :is-full-page="false" :active.sync="searchPlaylistsGetting" :can-cancel="true" />
           </b-notification>
           <h3
+            v-if="searchPlaylistsReady && search !== '' && !isEmpltyHit"
             class="title is-4"
             style="margin: 10px 0"
-            v-if="searchPlaylistsReady && search !== '' && !isEmpltyHit"
-            >
+          >
             「{{ search }}」の検索結果 : {{ filterdPlaylistCount }}件
-            </h3>
+          </h3>
           <div id="search-results">
             <div v-for="playlist of filteredPlaylists" :key="playlist.playlistId">
               <b-tooltip type="is-dark" label="playlist作成日 | total再生時間" style="float:right;">
@@ -62,7 +62,8 @@
                   <div class="nnn-yt-playlist-title" v-html="track.title" />
                   <div class="nnn-yt-playlist-channel-title" v-html="track.channelTitle" />
                   <span
-                    class="nnn-yt-playlist-duration">
+                    class="nnn-yt-playlist-duration"
+                  >
                     {{ track.durationStr }}
                   </span>
                 </a>
@@ -75,18 +76,21 @@
           class="title is-4 font-montserrat"
           style="margin-top:30px;margin-bottom:10px"
         >
-        back number
+          back number
         </h3>
         <div class="columns is-multiline">
-
-          <div class="column is-vertical is-half-tablet is-one-third-desktop" v-for="playlist of playlists" :key="playlist.playlistId">
+          <div
+            v-for="playlist of playlists"
+            :key="playlist.playlistId"
+            class="column is-vertical is-half-tablet is-one-third-desktop"
+          >
             <h3>
               <a
                 class="nnn-yt-playlist-t"
                 :href="playlist.url"
                 target="_blank"
               >
-              {{ playlist.title }}
+                {{ playlist.title }}
               </a>
               <b-tooltip type="is-dark" label="playlist作成日 | total再生時間" style="float:right;">
                 <span class="tag is-dark">
@@ -95,10 +99,10 @@
               </b-tooltip>
             </h3>
             <youtube
-              ref="youtube"
-              class="iframe-youtube"
               :id="'player-' + playlist.playlistId"
-              :player-vars="{ list: playlist.playlistId, v:playlist.firstVideoId }"
+              ref="youtube"
+              :player-vars="{ list: playlist.playlistId, v: playlist.firstVideoId }"
+              class="iframe-youtube"
               @ready="playlistReady"
               @playing="playlistPlaying"
             />
@@ -119,7 +123,8 @@
                 <div class="nnn-yt-playlist-channel-title">{{ track.channelTitle }}
                 </div>
                 <span
-                  class="nnn-yt-playlist-duration">
+                  class="nnn-yt-playlist-duration"
+                >
                   {{ track.durationStr }}
                 </span>
               </a>
@@ -129,8 +134,9 @@
         <infinite-loading
           ref="infiniteLoading"
           spinner="spiral"
-          @infinite="infiniteHandler">
-          <div slot="no-results"/>
+          @infinite="infiniteHandler"
+        >
+          <div slot="no-results" />
         </infinite-loading>
       </div>
     </div>
@@ -139,7 +145,6 @@
 
 <script>
 import { getPlaylists } from '~/common/playlistsapi'
-import axios from 'axios'
 
 export default {
   name: 'HomePage',
@@ -200,14 +205,15 @@ export default {
       return count
     }
   },
-  async asyncData() {
+  async asyncData({ req, res }) {
     const apiUrl = process.env.BNN_API_URL
     const playlists = await getPlaylists(apiUrl, { from: 0, to: 6 })
-    console.log(playlists)
+    const locationHostname = req.headers.host
 
     return {
       playlists,
-      apiUrl
+      apiUrl,
+      locationHostname
     }
   },
   methods: {
@@ -226,7 +232,6 @@ export default {
     },
     infiniteHandler() {
       (async () => {
-        console.log('start additional loading')
         const playlists = await getPlaylists(this.apiUrl, {
           from: this.playlists.length,
           to: this.playlists.length + 6

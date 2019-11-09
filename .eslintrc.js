@@ -14,6 +14,7 @@ module.exports = {
   // add your custom rules here
   rules: {
     "no-console": "warn",
-    "no-unused-vars": "warn"
+    "no-unused-vars": "warn",
+    "vue/no-v-html": "off"
   }
 }

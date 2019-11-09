@@ -38,7 +38,7 @@ export async function getPlaylists(apiUrl, params) {
     })
     return playlists
   } catch (error) {
-    console.error(error)
+    // console.error(error)
   }
   return []
 }
