@@ -1,7 +1,7 @@
 {
   "name": "back-number-n",
   "version": "1.0.0",
-  "description": "My unreal Nuxt.js project",
+  "description": "エオルゼアを代表するライブハウス「Live House N」のバックナンバーを一覧できるサイトです。過去のプレイリストを聞いたり、リクエストされた曲を検索することができます。",
   "author": "shon poni",
   "private": true,
   "scripts": {
