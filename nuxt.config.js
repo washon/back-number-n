@@ -10,7 +10,8 @@ export default {
   head: {
     title: pkg.name,
     script: [
-      { src: 'https://www.youtube.com/iframe_api' }
+      { src: 'https://www.youtube.com/iframe_api' },
+      { src: 'https://cdnjs.cloudflare.com/ajax/libs/event-source-polyfill/0.0.9/eventsource.js' }
     ],
     meta: [
       { charset: 'utf-8' },
@@ -83,6 +84,7 @@ export default {
           exclude: /(node_modules)/
         })
       }
-    }
+    },
+    transpile: ['@amcharts/amcharts4']
   }
 }

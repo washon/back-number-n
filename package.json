@@ -15,6 +15,7 @@
     "crawl": "node scheduler/crawl.js"
   },
   "dependencies": {
+    "@amcharts/amcharts4": "^4.8.4",
     "@nuxtjs/axios": "^5.8.0",
     "@nuxtjs/dotenv": "^1.4.1",
     "@nuxtjs/google-analytics": "^2.2.1",

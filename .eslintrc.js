@@ -15,6 +15,8 @@ module.exports = {
   rules: {
     "no-console": "warn",
     "no-unused-vars": "warn",
-    "vue/no-v-html": "off"
+    "vue/no-v-html": "off",
+    "camelcase": "off",
+    "no-extend-native": "off"
   }
 }

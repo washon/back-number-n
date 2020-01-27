@@ -1,5 +1,22 @@
 import axios from 'axios'
 
+// flatのpolyfillがieとedgeに必要だった...
+if (!Array.prototype.flat) {
+  Array.prototype.flat = function (depth) {
+    const flattend = [];
+    (function flat(array, depth) {
+      for (const el of array) {
+        if (Array.isArray(el) && depth > 0) {
+          flat(el, depth - 1)
+        } else {
+          flattend.push(el)
+        }
+      }
+    })(this, Math.floor(depth) || 1)
+    return flattend
+  }
+}
+
 export async function getPlaylists(apiUrl, params) {
   const res = await axios.get(`${apiUrl}/playlists`, { params: params })
   const _data = res.data
@@ -21,7 +38,8 @@ export async function getPlaylists(apiUrl, params) {
             thumbnail_url: ((track.thumbnails || {}).medium || {}).url,
             playing: track.position === 0,
             durationSec: PT2Seconds(trackInfo.duration),
-            durationStr: sec2str(PT2Seconds(trackInfo.duration))
+            durationStr: sec2str(PT2Seconds(trackInfo.duration)),
+            tags: trackInfo.tags
           })
         })
       }
@@ -35,10 +53,35 @@ export async function getPlaylists(apiUrl, params) {
         .map((e) => { return e.durationSec })
         .reduce((p, c) => { return p + c })
       playlist.totalDurationStr = sec2str(playlist.totalDuration)
+
+      const pattern = /[ ’':：！？!?「」『』【】()[\]/、。,.]/
+      playlist.tags = playlist.tracks.map((track) => {
+        const tags = ((track || {}).tags || [])
+          .concat([track.title.split(pattern)])
+          .flat()
+          .filter((x, i, self) => {
+            return !(x === '' || self.some((e, is) => {
+              if (i <= is || e === '') {
+                return false
+              }
+              if (/[()]/.test(x)) {
+                return true
+              }
+              return x.toLowerCase().includes(e.toLowerCase())
+            }))
+          }).join(',')
+          .replace(new RegExp('、', 'g'), ',').split(',')
+        // console.log(tags)
+        return tags
+      }).flat()
+      // console.log(playlist.title)
+      // console.log(playlist.tags)
+      // console.log(playlist.tags.join(' '))
     })
+    // console.log(playlists)
     return playlists
   } catch (error) {
-    // console.error(error)
+    console.error(error)
   }
   return []
 }

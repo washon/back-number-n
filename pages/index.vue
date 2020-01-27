@@ -98,11 +98,13 @@
                 </span>
               </b-tooltip>
             </h3>
+            <WordCloud :text="playlist.tags" :div-id="'chartdiv-' + playlist.playlistId" />
             <youtube
               :id="'player-' + playlist.playlistId"
               ref="youtube"
               :player-vars="{ list: playlist.playlistId, v: playlist.firstVideoId }"
               class="iframe-youtube"
+
               @ready="playlistReady"
               @playing="playlistPlaying"
             />
@@ -120,11 +122,8 @@
                   :style="{ background: 'url(' + track.thumbnail_url + ';)' }"
                 />
                 <div class="nnn-yt-playlist-title">{{ track.title }}</div>
-                <div class="nnn-yt-playlist-channel-title">{{ track.channelTitle }}
-                </div>
-                <span
-                  class="nnn-yt-playlist-duration"
-                >
+                <div class="nnn-yt-playlist-channel-title">{{ track.channelTitle }}</div>
+                <span class="nnn-yt-playlist-duration">
                   {{ track.durationStr }}
                 </span>
               </a>
@@ -144,10 +143,15 @@
 </template>
 
 <script>
+
 import { getPlaylists } from '~/common/playlistsapi'
+import WordCloud from '@/components/wordcloud.vue'
 
 export default {
   name: 'HomePage',
+  components: {
+    WordCloud
+  },
   data() {
     return {
       search: '',
@@ -282,8 +286,8 @@ export default {
     height: 56px;
     display: block;
     color: white;
-    padding: 4px;
     position: relative;
+    padding: 4px;
 }
 
 .nnn-yt-playlist-item.playing {
