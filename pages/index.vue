@@ -113,10 +113,10 @@
                 v-for="track of playlist.tracks"
                 :key="track.position"
                 class="nnn-yt-playlist-item"
-                :class="{ playing: track.playing }"
-                @click="handerClickVideo(playlist.playlistId, track.position)"
+                :class="{ playing: track.playing, no_longer: track.no_longer }"
+                @click="handerClickVideo(playlist.playlistId, track.videoId)"
               >
-                <div class="nnn-yt-playlist-id">{{ track.position }}</div>
+                <div class="nnn-yt-playlist-id">{{ track.no_longer ? "-" : track.position - ( track.trackPosGap || 0) }}</div>
                 <div
                   class="nnn-yt-playlist-thumbnail"
                   :style="{ background: 'url(' + track.thumbnail_url + ';)' }"
@@ -251,6 +251,8 @@ export default {
     },
     playlistReady(e) {
       this.players[e.getPlaylistId()] = e
+      e.playVideo()
+      e.stopVideo()
     },
     playlistPlaying(e) {
       const playlistId = e.getPlaylistId()
@@ -266,9 +268,28 @@ export default {
         }
       }
     },
-    handerClickVideo(playlistId, trackPos) {
+    handerClickVideo(playlistId, videoId) {
       if (playlistId in this.players) {
-        this.players[playlistId].playVideoAt(trackPos - 1)
+        for (let ip = 0; ip < this.playlists.length; ip++) {
+          const playlist = this.playlists[ip]
+          if (playlist.playlistId === playlistId) {
+            const curPlaylist = this.players[playlistId].getPlaylist()
+            let no_longer_count = 0
+            for (let it = 0; it < playlist.tracks.length; it++) {
+              const track = playlist.tracks[it]
+              if (track.videoId === videoId) {
+                this.players[playlistId].playVideoAt(track.position - 1 - no_longer_count)
+                break
+              }
+              track.no_longer = !curPlaylist.includes(track.videoId)
+              track.trackPosGap = no_longer_count
+              if (track.no_longer) {
+                no_longer_count += 1
+              }
+            }
+            break
+          }
+        }
       }
     }
   }
@@ -294,6 +315,11 @@ export default {
     background-color: darkred;
 }
 
+.nnn-yt-playlist-item.no_longer {
+    background-color: #393939 !important;
+    color: #656565 !important;
+}
+
 .nnn-yt-playlist-item:hover {
     background-color: rgba(0, 0, 0, 0.7);
 }
@@ -315,6 +341,7 @@ export default {
     margin: 6px 4px;
     background-size: contain !important;
     background-position: center;
+    background-repeat: round !important;
 }
 
 .nnn-yt-playlist-title {
