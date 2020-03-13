@@ -40,7 +40,7 @@ export default {
     series.accuracy = 4
     series.step = 5
     series.rotationThreshold = 0.7
-    series.maxCount = 64
+    series.maxCount = 40
     series.minWordLength = 2
     // series.labels.template.tooltipText = '{word}: {value}'
     series.fontFamily = 'Montserrat'
@@ -49,31 +49,34 @@ export default {
     series.maxFontSize = am4core.percent(10)
     series.excludeWords = [
       'ALL', 'All', 'all',
+      'AT', 'At', 'at',
       'ALBUM', 'Album', 'album',
       'AND', 'And', 'and',
       'AUDIO', 'Audio', 'audio',
       'BY', 'By', 'by',
+      'DOWNLOAD', 'Download', 'download', 'ダウンロード',
       'FEAT', 'Feat', 'feat', 'ft', 'Ft', 'FT',
       'FROM', 'From', 'from',
       'FOR', 'For', 'for',
       'FULL', 'Full', 'full', 'フル',
+      'FULL ALBUM', 'Full Album', 'full album', 'フルアルバム',
       'GO', 'Go', 'go',
       'IN', 'In', 'in',
       'IT', 'It', 'it',
       'IS', 'Is', 'is',
       'JAPAN', 'Japan', 'japan',
-      'LIVE', 'Live', 'live',
+      'LIVE', 'Live', 'live', 'ライブ',
       'LYRIC VIDEO', 'Lyric Video', 'lyric video',
       'LYRICS', 'Lyrics', 'lyrics', '歌詞',
       'ME', 'Me', 'me',
-      'MUSIC', 'Music', 'music', '音楽',
+      'MUSIC', 'Music', 'music', '音楽', 'ミュージック',
       'MV', 'mv', 'ミュージックビデオ', 'MUSIC VIDEO', 'Music Video', 'music video',
       'MY', 'My', 'my',
       'NO', 'No', 'no',
       'OF', 'Of', 'of',
       'OFFICIAL MUSIC VIDEO', 'Official Music Video', 'official music video',
       'OFFICIAL VIDEO', 'Official Video', 'official video',
-      'OFFICIAL', 'Official', 'official',
+      'OFFICIAL', 'Official', 'official', 'オフィシャル',
       'ON', 'On', 'on',
       'PV', 'Pv', 'pv',
       'RECORDS', 'Records', 'records',
@@ -83,8 +86,9 @@ export default {
       'TV', 'Tv', 'tv',
       'VER', 'Ver', 'ver',
       'VERSION', 'Version', 'version',
-      'VIDEO', 'Video', 'video',
+      'VIDEO', 'Video', 'video', 'ビデオ',
       'YOU', 'You', 'you',
+      'YOUTUBE', 'YouTube', 'youtube',
       'WITH', 'With', 'with',
       'an',
       'http', 'https',
