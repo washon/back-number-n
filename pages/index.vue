@@ -260,9 +260,16 @@ export default {
       for (let ip = 0; ip < this.playlists.length; ip++) {
         const playlist = this.playlists[ip]
         if (playlist.playlistId === playlistId) {
+          const curPlaylist = this.players[playlistId].getPlaylist()
+          let no_longer_count = 0
           for (let it = 0; it < playlist.tracks.length; it++) {
             const track = playlist.tracks[it]
             track.playing = track.videoId === videoId
+            track.no_longer = !curPlaylist.includes(track.videoId)
+            track.trackPosGap = no_longer_count
+            if (track.no_longer) {
+              no_longer_count += 1
+            }
           }
           break
         }
