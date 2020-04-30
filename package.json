@@ -21,7 +21,7 @@
     "@nuxtjs/google-analytics": "^2.2.1",
     "cross-env": "^5.2.1",
     "firebase-admin": "^7.4.0",
-    "jquery": "^3.4.1",
+    "jquery": "^3.5.0",
     "nuxt": "^2.10.2",
     "nuxt-buefy": "^0.3.17",
     "vue-infinite-loading": "^2.4.4",
