@@ -227,6 +227,7 @@ export default {
       // if (!this.searchPlaylistsReady) {
       this.searchPlaylistsGetting = true
       this.searchPlaylistsReady = false
+      this.searchPlaylists = []
       this.waitAndgo(this.search)
       // }
     },
@@ -240,9 +241,14 @@ export default {
         })
       }
 
+      if (searchQuery && searchQuery.length > 0) {
       // 1秒間request関数の実行を待つ。setTimeOutのIDを取得し、処理待ち用のキューに格納する
-      const eventId = setTimeout(request, 200, searchQuery)
-      $scope.searchQueue.push(eventId)
+        const eventId = setTimeout(request, 200, searchQuery)
+        $scope.searchQueue.push(eventId)
+      } else {
+        $scope.searchPlaylistsReady = true
+        $scope.searchPlaylistsGetting = false
+      }
 
       // サーバーへのリクエスト処理。ここでは便宜的にscopeへ代入します。
       async function request(query) {
