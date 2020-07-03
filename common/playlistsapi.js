@@ -19,3 +19,13 @@ export async function searchPlaylists(apiUrl, query) {
   }
   return []
 }
+
+export async function getPlaylistsCount(apiUrl) {
+  try {
+    const res = await axios.get(`${apiUrl}/playlists/count`)
+    return res.data.count
+  } catch (error) {
+    console.error(error)
+  }
+  return []
+}

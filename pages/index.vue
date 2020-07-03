@@ -22,8 +22,8 @@
             :closable="false"
             :loading="searchPlaylistsGetting"
           >
-            検索中
-            <b-loading :is-full-page="false" :active.sync="searchPlaylistsGetting" :can-cancel="true" />
+            検索データ構築中... ({{ searchPlaylists.length }}/{{ playlistsCount }})
+            <b-progress :value="searchPlaylists.length" :max="playlistsCount" />
           </b-notification>
           <h3
             v-if="searchPlaylistsReady && search !== '' && !isEmpltyHit"
@@ -144,7 +144,7 @@
 
 <script>
 
-import { getPlaylists, searchPlaylists } from '~/common/playlistsapi'
+import { getPlaylists, getPlaylistsCount } from '~/common/playlistsapi'
 import WordCloud from '@/components/wordcloud.vue'
 
 export default {
@@ -160,11 +160,18 @@ export default {
       searchPlaylistsReady: false,
       players: {},
       searchQueue: [],
-      showString: ''
+      showString: '',
+      queryString: '',
+      isStartedDumping: false,
+      isAwaiting: false,
+      playlistsCount: null
     }
   },
   computed: {
     isEmpltyHit() {
+      if (this.isAwaiting) {
+        return false
+      }
       if (!this.searchPlaylistsReady) {
         return false
       }
@@ -174,13 +181,13 @@ export default {
       return this.filteredPlaylists.length === 0
     },
     filteredPlaylists() {
-      if (!this.search) {
+      if (!this.queryString) {
         return []
       }
       if (!this.searchPlaylists) {
         return []
       }
-      const _searchL = this.search.toLowerCase().trim().split(' ')
+      const _searchL = this.queryString.toLowerCase().trim().split(' ')
       return this.searchPlaylists.map((playlist) => {
         const _pl = JSON.parse(JSON.stringify(playlist))
         if (this.hitsAllMultipleConditions(_pl.title, _searchL)) {
@@ -224,15 +231,36 @@ export default {
   },
   methods: {
     handlerSearchInput(e) {
-      // if (!this.searchPlaylistsReady) {
-      this.searchPlaylistsGetting = true
-      this.searchPlaylistsReady = false
-      this.searchPlaylists = []
+      if (!this.isStartedDumping) {
+        this.isStartedDumping = true
+        this.searchPlaylistsGetting = true
+        this.searchPlaylistsReady = false
+        this.searchPlaylists = []
+        this.startDumpSearchPlaylists()
+      }
       this.waitAndgo(this.search)
-      // }
+    },
+    async startDumpSearchPlaylists() {
+      this.playlistsCount = await getPlaylistsCount(this.apiUrl)
+
+      let isFinished = false
+      while (!isFinished) {
+        const playlists = await getPlaylists(this.apiUrl, {
+          from: this.searchPlaylists.length,
+          to: this.searchPlaylists.length + 6
+        })
+        if (playlists.length > 0) {
+          this.searchPlaylists = this.searchPlaylists.concat(playlists)
+        } else {
+          isFinished = true
+          this.searchPlaylistsReady = true
+          this.searchPlaylistsGetting = false
+        }
+      }
     },
     waitAndgo(searchQuery) {
       const $scope = this
+      $scope.isAwaiting = true
       // 処理待ちのイベントが無いか確認し、ある場合は全て実行をキャンセルする
       if ($scope.searchQueue.length > 0) {
         $scope.searchQueue.forEach(function (elem) {
@@ -241,20 +269,16 @@ export default {
         })
       }
 
-      if (searchQuery && searchQuery.length > 0) {
       // 1秒間request関数の実行を待つ。setTimeOutのIDを取得し、処理待ち用のキューに格納する
-        const eventId = setTimeout(request, 200, searchQuery)
-        $scope.searchQueue.push(eventId)
-      } else {
-        $scope.searchPlaylistsReady = true
-        $scope.searchPlaylistsGetting = false
-      }
+      const waitMsec = searchQuery.length < 3 ? 500 : 200
+      const eventId = setTimeout(request, waitMsec, searchQuery)
+      $scope.searchQueue.push(eventId)
 
       // サーバーへのリクエスト処理。ここでは便宜的にscopeへ代入します。
-      async function request(query) {
-        $scope.searchPlaylists = await searchPlaylists($scope.apiUrl, query)
-        $scope.searchPlaylistsReady = true
-        $scope.searchPlaylistsGetting = false
+      function request(query) {
+        // $scope.searchPlaylists = await searchPlaylists($scope.apiUrl, query)
+        $scope.queryString = query
+        $scope.isAwaiting = false
       }
     },
     hitsAllMultipleConditions(title, conditions) {
