@@ -22,7 +22,7 @@
             :closable="false"
             :loading="searchPlaylistsGetting"
           >
-            検索対象データの取得中...
+            検索中
             <b-loading :is-full-page="false" :active.sync="searchPlaylistsGetting" :can-cancel="true" />
           </b-notification>
           <h3
@@ -144,7 +144,7 @@
 
 <script>
 
-import { getPlaylists } from '~/common/playlistsapi'
+import { getPlaylists, searchPlaylists } from '~/common/playlistsapi'
 import WordCloud from '@/components/wordcloud.vue'
 
 export default {
@@ -158,7 +158,9 @@ export default {
       searchPlaylists: null,
       searchPlaylistsGetting: false,
       searchPlaylistsReady: false,
-      players: {}
+      players: {},
+      searchQueue: [],
+      showString: ''
     }
   },
   computed: {
@@ -221,12 +223,32 @@ export default {
     }
   },
   methods: {
-    async handlerSearchInput(e) {
-      if (!this.searchPlaylistsReady) {
-        this.searchPlaylistsGetting = true
-        this.searchPlaylists = await getPlaylists(this.apiUrl)
-        this.searchPlaylistsReady = true
-        this.searchPlaylistsGetting = false
+    handlerSearchInput(e) {
+      // if (!this.searchPlaylistsReady) {
+      this.searchPlaylistsGetting = true
+      this.searchPlaylistsReady = false
+      this.waitAndgo(this.search)
+      // }
+    },
+    waitAndgo(searchQuery) {
+      const $scope = this
+      // 処理待ちのイベントが無いか確認し、ある場合は全て実行をキャンセルする
+      if ($scope.searchQueue.length > 0) {
+        $scope.searchQueue.forEach(function (elem) {
+          clearTimeout(elem)
+          $scope.searchQueue.shift()
+        })
+      }
+
+      // 1秒間request関数の実行を待つ。setTimeOutのIDを取得し、処理待ち用のキューに格納する
+      const eventId = setTimeout(request, 200, searchQuery)
+      $scope.searchQueue.push(eventId)
+
+      // サーバーへのリクエスト処理。ここでは便宜的にscopeへ代入します。
+      async function request(query) {
+        $scope.searchPlaylists = await searchPlaylists($scope.apiUrl, query)
+        $scope.searchPlaylistsReady = true
+        $scope.searchPlaylistsGetting = false
       }
     },
     hitsAllMultipleConditions(title, conditions) {
