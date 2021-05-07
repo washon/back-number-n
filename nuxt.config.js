@@ -25,6 +25,10 @@ export default {
     ]
   },
 
+  env: {
+    BNN_API_URL: process.env.BNN_API_URL,
+  },
+
   /*
   ** Customize the progress-bar color
   */
