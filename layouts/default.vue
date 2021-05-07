@@ -6,11 +6,13 @@
       aria-label="main navigation"
     >
       <div class="navbar-brand">
-        <a
-          class="navbar-item title-logo"
-        >
-          back number N
-        </a>
+        <NuxtLink to="/">
+          <a
+            class="navbar-item title-logo"
+          >
+            back number N
+          </a>
+        </NuxtLink>
 
         <a
           class="navbar-item title-logo link-to-n"
@@ -20,6 +22,14 @@
         >
           Live House N
         </a>
+        <NuxtLink to="/playlists">
+          <a
+            class="navbar-item title-logo"
+            style="font-size:smaller;font-weight:800;height:100%;"
+          >
+            Playlists
+          </a>
+        </NuxtLink>
       </div>
     </nav>
     <section class="main-content">

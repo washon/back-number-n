@@ -221,12 +221,10 @@ export default {
   async asyncData({ req, res }) {
     const apiUrl = process.env.BNN_API_URL
     const playlists = await getPlaylists(apiUrl, { from: 0, to: 6 })
-    const locationHostname = req.headers.host
 
     return {
       playlists,
-      apiUrl,
-      locationHostname
+      apiUrl
     }
   },
   methods: {
