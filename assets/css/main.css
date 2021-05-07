@@ -15,7 +15,11 @@ a.navbar-item.link-to-n:hover, a.navbar-item.link-to-n.is-active, .navbar-link.l
 
 
 .navbar.header {
-  background: lightgray;
+  background: lightgray !important;
+}
+
+.navbar-item {
+  background: lightgray !important;
 }
 
 body {

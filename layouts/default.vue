@@ -6,31 +6,63 @@
       aria-label="main navigation"
     >
       <div class="navbar-brand">
-        <nuxt-link to="/">
-          <a
-            class="navbar-item title-logo"
-          >
-            back number N
-          </a>
-        </nuxt-link>
+        <div class="navbar-item">
+          <nuxt-link to="/">
+            <a
+              class="navbar-item title-logo"
+            >
+              back number N
+            </a>
+          </nuxt-link>
+        </div>
 
-        <a
-          class="navbar-item title-logo link-to-n"
-          style="font-size:smaller;font-weight:800;"
-          href="https://livehousen.wixsite.com/ff14n"
-          target="_blank"
-        >
-          Live House N
-        </a>
-        <nuxt-link to="/playlists">
-          <a
-            class="navbar-item title-logo"
-            style="font-size:smaller;font-weight:800;height:100%;"
-          >
-            Playlists
-          </a>
-        </nuxt-link>
+<!--
+         <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbarBasic">
+          <span aria-hidden="true"></span>
+          <span aria-hidden="true"></span>
+          <span aria-hidden="true"></span>
+        </a>-->
+
       </div>
+
+      <div
+        id="navbarBasic"
+        class="is-active"
+        style="display:flex;"
+        >
+        <div
+          class="navbar-start is-active"
+          >
+        </div>
+        <div
+          class="navbar-end is-active"
+          style="display:flex;"
+          >
+          <div class="navbar-item">
+            <a
+              class="navbar-item title-logo link-to-n"
+              style="font-size:smaller;font-weight:800;bottom:-5px;"
+              href="https://livehousen.wixsite.com/ff14n"
+              target="_blank"
+            >
+              Live House N
+            </a>
+
+          </div>
+          <div class="navbar-item">
+            <nuxt-link to="/playlists">
+              <a
+                class="navbar-item title-logo"
+                style="font-size:smaller;font-weight:800;height:100%;bottom:-5px;"
+              >
+                Playlists
+              </a>
+            </nuxt-link>
+          </div>
+        </div>
+
+      </div>
+
     </nav>
     <section class="main-content">
       <div class="container">
