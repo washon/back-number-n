@@ -20,7 +20,7 @@
     "@nuxtjs/dotenv": "^1.4.1",
     "@nuxtjs/google-analytics": "^2.2.1",
     "cross-env": "^5.2.1",
-    "firebase-admin": "^7.4.0",
+    "firebase-admin": "^11.4.1",
     "jquery": "^3.4.1",
     "nuxt": "^2.10.2",
     "nuxt-buefy": "^0.3.17",
