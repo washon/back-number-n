@@ -15,13 +15,13 @@
     "crawl": "node scheduler/crawl.js"
   },
   "dependencies": {
-    "@amcharts/amcharts4": "^4.8.4",
-    "@nuxtjs/axios": "^5.8.0",
+    "@amcharts/amcharts4": "^4.10.35",
+    "@nuxtjs/axios": "^5.13.6",
     "@nuxtjs/dotenv": "^1.4.1",
     "@nuxtjs/google-analytics": "^2.2.1",
     "cross-env": "^5.2.1",
-    "firebase-admin": "^7.4.0",
-    "jquery": "^3.4.1",
+    "firebase-admin": "^11.6.0",
+    "jquery": "^3.6.4",
     "nuxt": "^2.10.2",
     "nuxt-buefy": "^0.3.17",
     "vue-infinite-loading": "^2.4.4",
@@ -40,6 +40,6 @@
     "eslint-plugin-promise": "^4.2.1",
     "eslint-plugin-standard": "^4.0.1",
     "eslint-plugin-vue": "^5.2.3",
-    "nodemon": "^1.19.4"
+    "nodemon": "^2.0.22"
   }
 }
