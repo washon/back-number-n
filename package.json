@@ -14,6 +14,10 @@
     "precommit": "npm run lint",
     "crawl": "node scheduler/crawl.js"
   },
+  "engines": {
+    "node": "18.x",
+    "npm": "9.x"
+  },
   "dependencies": {
     "@amcharts/amcharts4": "^4.10.35",
     "@nuxtjs/axios": "^5.13.6",
