@@ -155,7 +155,6 @@ onMounted(() => {
 </script>
 
 <template>
-  amchart alt
   <div :id="divId" class="chartdiv" />
 </template>
 
