@@ -352,19 +352,21 @@ const handerClickVideo = (playlistId: string, videoId: string) => {
               :text="playlist.tags"
               :div-id="'chartdiv-' + playlist.playlistId"
             />
-            <YouTube
-              :id="'player-' + playlist.playlistId"
-              ref="ytref"
-              :src="`${playlist.firstVideoId}`"
-              :vars="{
-                list: playlist.playlistId,
-              }"
-              width="100%"
-              style="background: black"
-              height="300px"
-              @ready="playlistReady"
-              @state-change="onPlaylistStateChange"
-            />
+            <div style="width: 100%; height: 300px; background: black">
+              <YouTube
+                :id="'player-' + playlist.playlistId"
+                ref="ytref"
+                :src="`${playlist.firstVideoId}`"
+                :vars="{
+                  list: playlist.playlistId,
+                }"
+                width="100%"
+                style="background: black"
+                height="300px"
+                @ready="playlistReady"
+                @state-change="onPlaylistStateChange"
+              />
+            </div>
 
             <div class="nnn-yt-playlist-items">
               <a
