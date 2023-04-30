@@ -12,9 +12,9 @@ const YouTubeAPI = {
     do {
       const params = {
         part: 'snippet',
-        channelId: channelId, // 再生リストのID
+        channelId, // 再生リストのID
         maxResults: 50,
-        key: YouTubeAPI.API_KEY()
+        key: YouTubeAPI.API_KEY(),
       }
 
       if (nextPageToken) {
@@ -25,14 +25,14 @@ const YouTubeAPI = {
         method: 'GET',
         url: 'https://www.googleapis.com/youtube/v3/playlists',
         headers: { 'Content-Type': 'application/json' },
-        params: params
+        params,
       })
 
       res.data.items.forEach((e) => {
         playlists.push(e)
       })
 
-      hasNext = ('nextPageToken' in res.data)
+      hasNext = 'nextPageToken' in res.data
       nextPageToken = res.data.nextPageToken
     } while (hasNext)
     return playlists
@@ -45,49 +45,46 @@ const YouTubeAPI = {
     do {
       const params = {
         part: 'snippet,contentDetails',
-        playlistId: playlistId, // 再生リストのID
+        playlistId, // 再生リストのID
         maxResults: 10,
-        key: YouTubeAPI.API_KEY()
+        key: YouTubeAPI.API_KEY(),
       }
 
       if (nextPageToken) {
         params.pageToken = nextPageToken
       }
 
-      const res = await axios(
-        {
-          method: 'GET',
-          url: 'https://www.googleapis.com/youtube/v3/playlistItems',
-          headers: { 'Content-Type': 'application/json' },
-          params: params
-        })
+      const res = await axios({
+        method: 'GET',
+        url: 'https://www.googleapis.com/youtube/v3/playlistItems',
+        headers: { 'Content-Type': 'application/json' },
+        params,
+      })
 
       res.data.items.forEach((e) => {
         tracks.push(e)
       })
 
-      hasNext = ('nextPageToken' in res.data)
+      hasNext = 'nextPageToken' in res.data
       nextPageToken = res.data.nextPageToken
     } while (hasNext)
     return tracks
   },
 
   getVideoInfo: async (videoId) => {
-    const res = await axios(
-      {
-        method: 'GET',
-        url: 'https://www.googleapis.com/youtube/v3/videos',
-        headers: { 'Content-Type': 'application/json' },
-        params: {
-          part: 'snippet,contentDetails',
-          id: videoId, // 再生リストのID
-          maxResults: 1,
-          key: YouTubeAPI.API_KEY()
-        }
-      })
+    const res = await axios({
+      method: 'GET',
+      url: 'https://www.googleapis.com/youtube/v3/videos',
+      headers: { 'Content-Type': 'application/json' },
+      params: {
+        part: 'snippet,contentDetails',
+        id: videoId, // 再生リストのID
+        maxResults: 1,
+        key: YouTubeAPI.API_KEY(),
+      },
+    })
     return res.data
-  }
-
+  },
 }
 
 module.exports = YouTubeAPI

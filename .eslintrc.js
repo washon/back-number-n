@@ -1,22 +1,30 @@
 module.exports = {
-  root: true,
+  // root: true,
   env: {
     browser: true,
-    node: true
-  },
-  parserOptions: {
-    parser: 'babel-eslint'
+    es2021: true,
+    node: true,
   },
   extends: [
-    '@nuxtjs',
-    'plugin:nuxt/recommended'
+    'eslint:recommended',
+    'plugin:vue/vue3-recommended',
+    '@nuxtjs/eslint-config-typescript',
+    '@vue/prettier',
   ],
-  // add your custom rules here
+  overrides: [],
+  // parserに'vue-eslint-parser'を指定し、'@typescript-eslint/parser'はparserOptionsに指定する
+  parser: 'vue-eslint-parser',
+  parserOptions: {
+    parser: '@typescript-eslint/parser',
+    ecmaVersion: 'latest',
+    sourceType: 'module',
+  },
+  plugins: ['vue', '@typescript-eslint'],
   rules: {
-    "no-console": "warn",
-    "no-unused-vars": "warn",
-    "vue/no-v-html": "off",
-    "camelcase": "off",
-    "no-extend-native": "off"
-  }
+    'no-console': 'warn',
+    'no-unused-vars': 'warn',
+    'vue/no-v-html': 'off',
+    camelcase: 'off',
+    'no-extend-native': 'off',
+  },
 }

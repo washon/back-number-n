@@ -19,45 +19,66 @@ const UpdateDB = {
     let count = 0
     for (const item of ytPlaylists) {
       if (count >= MAX_COUNT) {
-        console.log('Stopping update playlists, cause too many updatable playlist.')
+        console.log(
+          'Playlists updating stopped. The latest 10 playlists are selected to update.'
+        )
         return Promise.all(promises)
       }
       const playlistId = item.id
 
       // 実際のplaylistの中の動画数を取得
       count++ // etagで判定すればこのカウントはいらないけど、とりあえず。
-      const playlistItems = await YouTubeAPI.getPlaylistItems(playlistId).catch((err) => {
-        console.log(err)
-      })
+      const playlistItems = await YouTubeAPI.getPlaylistItems(playlistId).catch(
+        (err) => {
+          console.log(err)
+        }
+      )
 
       // DBに保存されているplaylistの中での動画数を取得
-      const queryTracks = rootRef.child('playlist_tracks').orderByKey().equalTo(playlistId)
+      const queryTracks = rootRef
+        .child('playlist_tracks')
+        .orderByKey()
+        .equalTo(playlistId)
       const ssTracks = await queryTracks.once('value')
       const ownTracks = ((ssTracks.val() || {})[playlistId] || {}).tracks || {}
 
       // javascriptで連想配列のlengthは取れない
       const ownTracksLength = (Object.keys(ownTracks) || []).length
-      console.log(`cmp length : ${playlistItems.length} > ${ownTracksLength} = ${playlistItems.length > ownTracksLength}`)
+      console.log(
+        `cmp length : ${playlistItems.length} > ${ownTracksLength} = ${
+          playlistItems.length > ownTracksLength
+        }`
+      )
 
       if (playlistItems.length > ownTracksLength) {
         count++
         console.log(`upsert playlist_tracks : ${playlistId}`)
-        promises.push(UpdateDB.updatePlaylistItems(rootRef, playlistId, playlistItems, ownTracks))
+        promises.push(
+          UpdateDB.updatePlaylistItems(
+            rootRef,
+            playlistId,
+            playlistItems,
+            ownTracks
+          )
+        )
       }
 
-      const queryPlaylist = rootRef.child('playlists').orderByKey().equalTo(playlistId)
+      const queryPlaylist = rootRef
+        .child('playlists')
+        .orderByKey()
+        .equalTo(playlistId)
       const ssPlaylist = await queryPlaylist.once('value')
       if (!ssPlaylist.val()) {
         console.log(`add playlist info : ${playlistId}`)
         const playlistsRef = rootRef.child('playlists')
         playlistsRef.child(playlistId).set({
           kind: item.kind,
-          playlistId: playlistId,
+          playlistId,
           channelTitle: item.snippet.channelTitle,
           title: item.snippet.title,
           description: item.snippet.description,
           publishedAt: item.snippet.publishedAt,
-          thumbnails: item.snippet.thumbnails
+          thumbnails: item.snippet.thumbnails,
         })
       }
     }
@@ -73,23 +94,24 @@ const UpdateDB = {
       }
 
       promises.push(
-        (
-          async () => {
-            const queryVideos = rootRef.child('videos').child(videoId)
-            let videoInfo = await queryVideos.once('value')
-            if (videoInfo.val() === null) {
-              await UpdateDB.updateVideoInfo(rootRef, videoId)
-              videoInfo = await queryVideos.once('value')
-            }
-
-            console.log(`add track ${videoId} into ${playlistId}`)
-            const tracksRef = rootRef.child('playlist_tracks').child(playlistId).child('tracks')
-            await tracksRef.child(videoId).set({
-              position: index,
-              info: videoInfo.val() || {}
-            })
+        (async () => {
+          const queryVideos = rootRef.child('videos').child(videoId)
+          let videoInfo = await queryVideos.once('value')
+          if (videoInfo.val() === null) {
+            await UpdateDB.updateVideoInfo(rootRef, videoId)
+            videoInfo = await queryVideos.once('value')
           }
-        )() // asyncだけだと関数を渡していることになる。無名関数を実行して上げる必要があるので注意
+
+          console.log(`add track ${videoId} into ${playlistId}`)
+          const tracksRef = rootRef
+            .child('playlist_tracks')
+            .child(playlistId)
+            .child('tracks')
+          await tracksRef.child(videoId).set({
+            position: index,
+            info: videoInfo.val() || {},
+          })
+        })() // asyncだけだと関数を渡していることになる。無名関数を実行して上げる必要があるので注意
       )
     }
     return Promise.all(promises)
@@ -120,10 +142,10 @@ const UpdateDB = {
       publishedAt: item.snippet.publishedAt || '',
       thumbnails: item.snippet.thumbnails || {},
 
-      duration: (item.contentDetails || {}).duration || ''
+      duration: (item.contentDetails || {}).duration || '',
     })
     return 'resolved!'
-  }
+  },
 }
 
 module.exports = UpdateDB

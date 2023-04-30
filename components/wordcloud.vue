@@ -2,114 +2,149 @@
   <div :id="divId" class="chartdiv" />
 </template>
 
-<style lang="css" scoped>
-.chartdiv {
-  width: 100%;
-  height: 300px;
-  background: rgba(0, 0, 0, 0.89);
-  overflow: hidden;
-}
-</style>
-
 <script>
-import * as am4core from '@amcharts/amcharts4/core'
-import am4themes_animated from '@amcharts/amcharts4/themes/animated'
-import * as am4plugins_wordCloud from '@amcharts/amcharts4/plugins/wordCloud'
+import * as am5 from '@amcharts/amcharts5'
+import * as am5wc from '@amcharts/amcharts5/wc'
+import am5themes_Animated from '@amcharts/amcharts5/themes/Animated'
 
-export default {
+export default defineComponent({
+  name: 'WordCloud',
   props: {
     divId: {
       type: String,
       default: 'chartdiv',
-      required: true
+      required: false,
     },
     text: {
       type: Array,
       default: () => [''],
-      required: true
-    }
+      required: true,
+    },
   },
   mounted() {
-    // Themes begin
-    am4core.useTheme(am4themes_animated)
-    // Themes end
+    const root = am5.Root.new(this.divId)
 
-    const chart = am4core.create(this.divId, am4plugins_wordCloud.WordCloud)
-    const series = chart.series.push(new am4plugins_wordCloud.WordCloudSeries())
+    root.setThemes([am5themes_Animated.new(root)])
 
-    series.accuracy = 4
-    series.step = 5
-    series.rotationThreshold = 0.7
-    series.maxCount = 40
-    series.minWordLength = 2
-    // series.labels.template.tooltipText = '{word}: {value}'
-    series.fontFamily = 'Montserrat'
-    series.fontWeight = 800
-    series.minFontSize = am4core.percent(4)
-    series.maxFontSize = am4core.percent(10)
-    series.excludeWords = [
-      'ALL', 'All', 'all',
-      'AT', 'At', 'at',
-      'ALBUM', 'Album', 'album',
-      'AND', 'And', 'and',
-      'AUDIO', 'Audio', 'audio',
-      'BY', 'By', 'by',
-      'DOWNLOAD', 'Download', 'download', 'ダウンロード',
-      'FEAT', 'Feat', 'feat', 'ft', 'Ft', 'FT',
-      'FROM', 'From', 'from',
-      'FOR', 'For', 'for',
-      'FULL', 'Full', 'full', 'フル',
-      'FULL ALBUM', 'Full Album', 'full album', 'フルアルバム',
-      'GO', 'Go', 'go',
-      'IN', 'In', 'in',
-      'IT', 'It', 'it',
-      'IS', 'Is', 'is',
-      'JAPAN', 'Japan', 'japan',
-      'LIVE', 'Live', 'live', 'ライブ',
-      'LYRIC VIDEO', 'Lyric Video', 'lyric video',
-      'LYRICS', 'Lyrics', 'lyrics', '歌詞',
-      'ME', 'Me', 'me',
-      'MUSIC', 'Music', 'music', '音楽', 'ミュージック',
-      'MV', 'mv', 'ミュージックビデオ', 'MUSIC VIDEO', 'Music Video', 'music video',
-      'MY', 'My', 'my',
-      'NO', 'No', 'no',
-      'OF', 'Of', 'of',
-      'OFFICIAL MUSIC VIDEO', 'Official Music Video', 'official music video',
-      'OFFICIAL VIDEO', 'Official Video', 'official video',
-      'OFFICIAL', 'Official', 'official', 'オフィシャル',
-      'ON', 'On', 'on',
-      'PV', 'Pv', 'pv',
-      'RECORDS', 'Records', 'records',
-      'SONG', 'Song', 'song',
-      'THE', 'The', 'the',
-      'TO', 'To', 'to',
-      'TV', 'Tv', 'tv',
-      'VER', 'Ver', 'ver',
-      'VERSION', 'Version', 'version',
-      'VIDEO', 'Video', 'video', 'ビデオ',
-      'YOU', 'You', 'you',
-      'YOUTUBE', 'YouTube', 'youtube',
-      'WITH', 'With', 'with',
+    const series = root.container.children.push(
+      am5wc.WordCloud.new(root, {
+        colors: am5.ColorSet.new(root, {
+          colors: [
+            am5.color(0x4ecdc4), //
+            am5.color(0xd14081), //
+            am5.color(0xf3c98b),
+            am5.color(0xf2d0a4),
+            am5.color(0xc3bef7),
+          ],
+        }),
+        // angles: [0],
+
+        accuracy: 4,
+        step: 5,
+
+        // rotation: -5,
+        // centerX: am5.percent(80),
+        // centerY: am5.percent(80),
+        // x: am5.percent(80),
+        // y: am5.percent(80),
+
+        rotationThreshold: 0.9,
+
+        maxCount: 40,
+        minWordLength: 2,
+
+        minFontSize: am5.percent(4),
+        maxFontSize: am5.percent(10),
+        randomness: 0,
+        categoryField: 'tag',
+        valueField: 'weight',
+      })
+    )
+
+    const EXCLUDE_WORDS = [
+      'all',
+      'at',
+      'album',
+      'and',
+      'audio',
+      'by',
+      'download',
+      'ダウンロード',
+      'feat',
+      'ft',
+      'from',
+      'for',
+      'full',
+      'フル',
+      'full album',
+      'フルアルバム',
+      'go',
+      'in',
+      'it',
+      'is',
+      'japan',
+      'live',
+      'ライブ',
+      'lyric video',
+      'lyric',
+      'lyrics',
+      '歌詞',
+      'me',
+      'music',
+      '音楽',
+      'ミュージック',
+      'mv',
+      'ミュージックビデオ',
+      'music video',
+      'my',
+      'no',
+      'of',
+      'official music video',
+      'official video',
+      'official',
+      'オフィシャル',
+      'on',
+      'pv',
+      'records',
+      'song',
+      'the',
+      'to',
+      'tv',
+      'ver',
+      'version',
+      'video',
+      'ビデオ',
+      'you',
+      'youtube',
+      'with',
       'an',
-      'http', 'https',
+      'http',
+      'https',
       'new',
       'twitter',
-      'undefined', 'unreachable',
-      '高画質', '高音質',
-      'HD', 'Hd', 'hd',
-      'HQ', 'Hq', 'hq',
-      'ようつべ', 'vevo',
-      '(', ')'
+      'undefined',
+      'unreachable',
+      '高画質',
+      '高音質',
+      'hd',
+      'hq',
+      'ようつべ',
+      'vevo',
+      '(',
+      ')',
     ]
 
-    series.randomness = 0.4
-    // series.text = this.text
+    series.labels.template.setAll({
+      fontFamily: 'Montserrat',
+      fontWeight: 800,
+    })
+
     const calc = {}
     this.text.forEach((tag) => {
-      if (!tag || tag.length < series.minWordLength || tag.length > 20) {
+      if (!tag || tag.length < 2 || tag.length > 20) {
         return
       }
-      if (series.excludeWords.includes(tag)) {
+      if (EXCLUDE_WORDS.includes(tag.toLowerCase())) {
         return
       }
       if (!(tag in calc)) {
@@ -121,28 +156,31 @@ export default {
         calc[tag] += 1.2
       }
     })
-    series.data = []
+
+    const _d = []
     for (const k in calc) {
-      series.data.push({ tag: k, weight: calc[k] })
+      _d.push({ tag: k, weight: calc[k] })
     }
-    series.data = series.data.sort((a, b) => { return b.weight - a.weight }).slice(0, series.maxCount)
+    const _data = _d
+      .sort((a, b) => {
+        return b.weight - a.weight
+      })
+      .slice(0, 40)
 
-    // console.log(series.data)
-    series.dataFields.word = 'tag'
-    series.dataFields.value = 'weight'
+    for (let i = 0; i < Math.min(1, _data.length); i++) {
+      _data[i].weight += 1
+    }
 
-    // // progress
-    // series.events.on('arrangestarted', function (ev) {
-    //   ev.target.baseSprite.preloader.show(0)
-    // })
-
-    // series.events.on('arrangeprogress', function (ev) {
-    //   ev.target.baseSprite.preloader.progress = ev.progress
-    // })
-
-    // カラフルになる。
-    series.colors = new am4core.ColorSet()
-    series.colors.passOptions = {} // makes it loop
-  }
-}
+    series.data.setAll(_data)
+  },
+})
 </script>
+
+<style lang="css" scoped>
+.chartdiv {
+  width: 100%;
+  height: 300px;
+  background: rgba(0, 0, 0, 0.89);
+  overflow: hidden;
+}
+</style>
