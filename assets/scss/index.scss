@@ -25,19 +25,36 @@ a.navbar-item.link-to-n.is-active,
 
 .navbar.header {
   background: lightgray !important;
+  transition:background-color 0.5s;
 }
 
 .navbar-item,
 .navbar-item:focus,
 .navbar-item:focus-within {
   background: lightgray !important;
+  transition:background-color 0.5s;
 }
 
 body {
   color: #4a4a4a;
   background: lightgray;
+  transition:background-color 0.5s;
 }
 
+body.body-shuffle {
+  color: white;
+  background: #0f0f0f;
+
+.navbar.header {
+  background: #0f0f0f !important;
+}
+
+.navbar-item,
+.navbar-item:focus,
+.navbar-item:focus-within {
+  background: #0f0f0f !important;
+}
+}
 a {
   color: white;
 }

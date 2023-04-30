@@ -40,6 +40,20 @@
               Playlists
             </nuxt-link>
           </div>
+          <div class="navbar-item">
+            <nuxt-link
+              to="/shuffle"
+              class="navbar-item title-logo"
+              style="
+                font-size: smaller;
+                font-weight: 800;
+                height: 100%;
+                bottom: -5px;
+              "
+            >
+              Shuffle
+            </nuxt-link>
+          </div>
         </div>
       </div>
     </nav>

@@ -34,3 +34,14 @@ export async function getPlaylistsCount(apiUrl: string) {
   }
   return []
 }
+
+export async function getShuffled(apiUrl: string) {
+  try {
+    const res = await fetch(`${apiUrl}/shuffle`)
+    const data = await res.json()
+    return data
+  } catch (error) {
+    console.error(error)
+  }
+  return []
+}
